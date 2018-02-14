@@ -8,38 +8,38 @@ package Agenda;
 import java.util.ArrayList;
 
 
-
 /**
- *
  * @author dorumuntean
  */
 public class CarteDeTelefon {
-    
+
     private ArrayList<Abonat> abonati = new ArrayList<>();
-    
-    
+
+
     public void adaugaAbonat(Abonat abonat) {
         //TODO
     }
-    
+
     public void stergeAbonat(Abonat abonat) {
         //TODO
     }
-    
+
     public void modificaAbonat(Abonat abonat) {
         //TODO
     }
-    
+
     public Abonat cautaAbonat(String nume) {
         //TODO
+        return null;
     }
-    
-    public Abonat cautaAbonatDupacnp(String CNP) {
+
+    public Abonat cautaAbonatDupaCNP(String CNP) {
         //TODO
+        return null;
     }
-    
+
     //TODO - salvare si incarcare date hdd
-    
+
     //ordonare abonati dupa oricare din criteriile posibile
-  
+
 }

@@ -5,10 +5,16 @@
  */
 package Agenda;
 
+
+import java.io.Serializable;
+
 /**
- *
  * @author dorumuntean
  */
-public class NrMobil extends NrTel {
-    
+public class NrMobil extends NrTel implements Serializable {
+
+    public NrMobil(String numar) {
+        super(numar, TipTelefon.MOBIL);
+        valideazaNumar(numar);
+    }
 }
