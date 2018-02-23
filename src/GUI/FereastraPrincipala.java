@@ -5,17 +5,103 @@
  */
 package GUI;
 
+import Agenda.Abonat;
+import Agenda.CarteDeTelefon;
+import Agenda.NrFix;
+import Agenda.NrMobil;
+import Agenda.NrTel;
+import Reclame.TaskReclame;
+import Agenda.TipTelefon;
+import Exceptii.SaveException;
+import Reclame.TimerReclame;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.Timer;
+import java.util.TimerTask;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 /**
- *
  * @author dorumuntean
  */
 public class FereastraPrincipala extends javax.swing.JFrame {
+
+
+    private CarteDeTelefon model = new CarteDeTelefon();
+    TimerReclame reclame;
 
     /**
      * Creates new form FereastraPrincipala
      */
     public FereastraPrincipala() {
         initComponents();
+
+        //TODO verifica inregistrare aplicatie
+
+
+        //TODO add model
+        //incarcare date si setare in tabel
+        //model = incarcareInfoAuto();
+        jTable1.setModel(model);
+        jTable1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        reclame = new TimerReclame(jLabelReclame);
+        reclame.pornesteReclame();
+
+        fiveMinSave();
+    }
+
+    /**
+     * Salveaza agenda la fiecare 5 min
+     */
+    public void fiveMinSave() {
+
+        Timer timerS = new Timer();
+        timerS.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                //int x = m.getRowCount();
+                //if(x != 0){ //verificare daca agenda este goala
+                //salvareInfoAuto(agenda);
+                jLabelSalvare.setText("Datele au fost salvate");
+                Timer timerS2 = new Timer();
+                timerS2.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        jLabelSalvare.setText("");
+                    }
+                }, 5000);
+            }
+//		};	
+        }, 10000, 60000);
+    }
+
+    /**
+     * Deschide fereastra Save si incearca salvarea agendei
+     */
+    public void save(CarteDeTelefon carteDeTelefon) {
+        if (jFileChooser1.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            try {
+                //TODO
+            } catch (SaveException se) {
+                //TODO
+            }
+        }
+    }
+
+    /**
+     * Reseteaza campurile din fereastra Adauga abonat
+     */
+    public void resetAddFields() {
+        jTextFirstName.setText("");
+        jTextLastName.setText("");
+        jTextCnp.setText("");
+        jTextPhone.setText("");
     }
 
     /**
@@ -26,15 +112,66 @@ public class FereastraPrincipala extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         jDialogIesire = new javax.swing.JDialog();
+        jPanel1 = new javax.swing.JPanel();
         jButtonDa = new javax.swing.JButton();
         jButtonNu = new javax.swing.JButton();
+        jPanel4 = new javax.swing.JPanel();
         jLabelConfirmare = new javax.swing.JLabel();
         jDialogAbout = new javax.swing.JDialog();
+        jPanel2 = new javax.swing.JPanel();
         jLabelAgenda = new javax.swing.JLabel();
         jLabelNume = new javax.swing.JLabel();
+        jPanel3 = new javax.swing.JPanel();
         jButtonOk = new javax.swing.JButton();
+        jFileChooser1 = new javax.swing.JFileChooser();
+        jDialogAdauga = new javax.swing.JDialog();
+        jPanelForm = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jTextLastName = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        jTextFirstName = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        jTextCnp = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        jTextPhone = new javax.swing.JTextField();
+        jComboBoxPhoneType = new javax.swing.JComboBox<>();
+        jPanelButoane = new javax.swing.JPanel();
+        jButtonInchide = new javax.swing.JButton();
+        jButtonAdaugaAbonat = new javax.swing.JButton();
+        jDialogSterge = new javax.swing.JDialog();
+        jButtonNuSterge = new javax.swing.JButton();
+        jButtonStergeAbonat = new javax.swing.JButton();
+        jLabel5 = new javax.swing.JLabel();
+        jFrameSplashScreen = new javax.swing.JFrame();
+        jLabel6 = new javax.swing.JLabel();
+        jProgressBar1 = new javax.swing.JProgressBar();
+        jDialogSortare = new javax.swing.JDialog();
+        jLabel7 = new javax.swing.JLabel();
+        jComboBox1 = new javax.swing.JComboBox<>();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        jDialogInregistrare = new javax.swing.JDialog();
+        jLabel8 = new javax.swing.JLabel();
+        jTextField2 = new javax.swing.JTextField();
+        jButton3 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
+        jDialogModifica = new javax.swing.JDialog();
+        jPanelForm1 = new javax.swing.JPanel();
+        jLabel9 = new javax.swing.JLabel();
+        jTextLastName1 = new javax.swing.JTextField();
+        jLabel10 = new javax.swing.JLabel();
+        jTextFirstName1 = new javax.swing.JTextField();
+        jLabel11 = new javax.swing.JLabel();
+        jTextCnp1 = new javax.swing.JTextField();
+        jLabel12 = new javax.swing.JLabel();
+        jTextPhone1 = new javax.swing.JTextField();
+        jComboBoxPhoneType1 = new javax.swing.JComboBox<>();
+        jPanelButoane1 = new javax.swing.JPanel();
+        jButtonInchide1 = new javax.swing.JButton();
+        jButtonModificaAbonat = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jButtonAdauga = new javax.swing.JButton();
@@ -45,6 +182,7 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         jLabelReclame = new javax.swing.JLabel();
         jLabelCauta = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
+        jLabelSalvare = new javax.swing.JLabel();
         MeniuPrincipal = new javax.swing.JMenuBar();
         MeniuFile = new javax.swing.JMenu();
         JMenuOpen = new javax.swing.JMenuItem();
@@ -53,9 +191,9 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         JMenuIesire = new javax.swing.JMenuItem();
         MeniuAbonati = new javax.swing.JMenu();
         jMenuAdauga = new javax.swing.JMenuItem();
-        jMenuCauta = new javax.swing.JMenuItem();
         jMenuSterge = new javax.swing.JMenuItem();
         jMenuModifica = new javax.swing.JMenuItem();
+        jMenuCauta = new javax.swing.JMenuItem();
         MeniuHelp = new javax.swing.JMenu();
         jMenuInregistrare = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
@@ -63,65 +201,66 @@ public class FereastraPrincipala extends javax.swing.JFrame {
 
         jDialogIesire.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         jDialogIesire.setTitle("Confirmare");
-        jDialogIesire.setMinimumSize(new java.awt.Dimension(300, 100));
+        jDialogIesire.setMinimumSize(new java.awt.Dimension(300, 200));
         jDialogIesire.setModal(true);
-        jDialogIesire.setPreferredSize(new java.awt.Dimension(300, 100));
         jDialogIesire.setResizable(false);
+        jDialogIesire.setSize(new java.awt.Dimension(300, 200));
+        jDialogIesire.getContentPane().setLayout(new java.awt.GridBagLayout());
 
-        jButtonDa.setMnemonic('D');
         jButtonDa.setText("DA");
         jButtonDa.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonDaActionPerformed(evt);
             }
         });
+        jPanel1.add(jButtonDa);
 
-        jButtonNu.setMnemonic('N');
-        jButtonNu.setText("Nu");
+        jButtonNu.setText("NU");
         jButtonNu.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonNuActionPerformed(evt);
             }
         });
+        jPanel1.add(jButtonNu);
 
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        jDialogIesire.getContentPane().add(jPanel1, gridBagConstraints);
+
+        jLabelConfirmare.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabelConfirmare.setText("Sunteti siguri ca doriti sa iesiti?");
+        jPanel4.add(jLabelConfirmare);
 
-        javax.swing.GroupLayout jDialogIesireLayout = new javax.swing.GroupLayout(jDialogIesire.getContentPane());
-        jDialogIesire.getContentPane().setLayout(jDialogIesireLayout);
-        jDialogIesireLayout.setHorizontalGroup(
-            jDialogIesireLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jDialogIesireLayout.createSequentialGroup()
-                .addContainerGap(51, Short.MAX_VALUE)
-                .addGroup(jDialogIesireLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabelConfirmare)
-                    .addGroup(jDialogIesireLayout.createSequentialGroup()
-                        .addComponent(jButtonDa)
-                        .addGap(30, 30, 30)
-                        .addComponent(jButtonNu)))
-                .addGap(51, 51, 51))
-        );
-        jDialogIesireLayout.setVerticalGroup(
-            jDialogIesireLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jDialogIesireLayout.createSequentialGroup()
-                .addGap(12, 12, 12)
-                .addComponent(jLabelConfirmare)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jDialogIesireLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButtonNu)
-                    .addComponent(jButtonDa))
-                .addContainerGap(38, Short.MAX_VALUE))
-        );
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.ipady = 10;
+        jDialogIesire.getContentPane().add(jPanel4, gridBagConstraints);
 
         jDialogAbout.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         jDialogAbout.setTitle("About");
         jDialogAbout.setLocation(new java.awt.Point(0, 0));
-        jDialogAbout.setMinimumSize(new java.awt.Dimension(200, 200));
-        jDialogAbout.setPreferredSize(new java.awt.Dimension(200, 200));
+        jDialogAbout.setMinimumSize(new java.awt.Dimension(300, 300));
         jDialogAbout.setResizable(false);
+        jDialogAbout.setSize(new java.awt.Dimension(300, 300));
+        jDialogAbout.getContentPane().setLayout(new java.awt.GridBagLayout());
 
+        jPanel2.setLayout(new java.awt.BorderLayout(0, 30));
+
+        jLabelAgenda.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabelAgenda.setText("Agenda Telefonica");
+        jPanel2.add(jLabelAgenda, java.awt.BorderLayout.CENTER);
 
+        jLabelNume.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabelNume.setText("Muntean Doru");
+        jPanel2.add(jLabelNume, java.awt.BorderLayout.PAGE_START);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        jDialogAbout.getContentPane().add(jPanel2, gridBagConstraints);
 
         jButtonOk.setText("OK");
         jButtonOk.addActionListener(new java.awt.event.ActionListener() {
@@ -130,33 +269,431 @@ public class FereastraPrincipala extends javax.swing.JFrame {
             }
         });
 
-        javax.swing.GroupLayout jDialogAboutLayout = new javax.swing.GroupLayout(jDialogAbout.getContentPane());
-        jDialogAbout.getContentPane().setLayout(jDialogAboutLayout);
-        jDialogAboutLayout.setHorizontalGroup(
-            jDialogAboutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jDialogAboutLayout.createSequentialGroup()
-                .addGroup(jDialogAboutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jDialogAboutLayout.createSequentialGroup()
-                        .addGap(85, 85, 85)
-                        .addComponent(jLabelAgenda))
-                    .addGroup(jDialogAboutLayout.createSequentialGroup()
-                        .addGap(98, 98, 98)
-                        .addGroup(jDialogAboutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButtonOk)
-                            .addComponent(jLabelNume))))
-                .addContainerGap(70, Short.MAX_VALUE))
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+                jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 116, Short.MAX_VALUE)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(jPanel3Layout.createSequentialGroup()
+                                        .addGap(0, 0, Short.MAX_VALUE)
+                                        .addComponent(jButtonOk)
+                                        .addGap(0, 0, Short.MAX_VALUE)))
         );
-        jDialogAboutLayout.setVerticalGroup(
-            jDialogAboutLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jDialogAboutLayout.createSequentialGroup()
-                .addGap(23, 23, 23)
-                .addComponent(jLabelAgenda)
-                .addGap(29, 29, 29)
-                .addComponent(jLabelNume)
-                .addGap(32, 32, 32)
-                .addComponent(jButtonOk)
-                .addContainerGap(40, Short.MAX_VALUE))
+        jPanel3Layout.setVerticalGroup(
+                jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 100, Short.MAX_VALUE)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(jPanel3Layout.createSequentialGroup()
+                                        .addGap(0, 0, Short.MAX_VALUE)
+                                        .addComponent(jButtonOk)
+                                        .addGap(0, 0, Short.MAX_VALUE)))
         );
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        jDialogAbout.getContentPane().add(jPanel3, gridBagConstraints);
+
+        jDialogAdauga.setTitle("Adauga");
+        jDialogAdauga.setMinimumSize(new java.awt.Dimension(400, 300));
+        jDialogAdauga.setResizable(false);
+        jDialogAdauga.addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                jDialogAdaugaWindowClosing(evt);
+            }
+        });
+        jDialogAdauga.getContentPane().setLayout(new java.awt.GridBagLayout());
+
+        jPanelForm.setLayout(new java.awt.GridBagLayout());
+
+        jLabel1.setText("Nume");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        jPanelForm.add(jLabel1, gridBagConstraints);
+
+        jTextLastName.setToolTipText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.ipadx = 190;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 0.6;
+        jPanelForm.add(jTextLastName, gridBagConstraints);
+
+        jLabel2.setText("Prenume");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        jPanelForm.add(jLabel2, gridBagConstraints);
+
+        jTextFirstName.setToolTipText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.ipadx = 190;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 0.6;
+        jPanelForm.add(jTextFirstName, gridBagConstraints);
+
+        jLabel3.setText("CNP");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        jPanelForm.add(jLabel3, gridBagConstraints);
+
+        jTextCnp.setToolTipText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.ipadx = 190;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 0.6;
+        jPanelForm.add(jTextCnp, gridBagConstraints);
+
+        jLabel4.setText("Telefon");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        jPanelForm.add(jLabel4, gridBagConstraints);
+
+        jTextPhone.setToolTipText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.ipadx = 140;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        jPanelForm.add(jTextPhone, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        jPanelForm.add(jComboBoxPhoneType, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        jDialogAdauga.getContentPane().add(jPanelForm, gridBagConstraints);
+
+        jButtonInchide.setText("Inchide");
+        jButtonInchide.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonInchideActionPerformed(evt);
+            }
+        });
+        jPanelButoane.add(jButtonInchide);
+
+        jButtonAdaugaAbonat.setText("Adauga");
+        jButtonAdaugaAbonat.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonAdaugaAbonatActionPerformed(evt);
+            }
+        });
+        jPanelButoane.add(jButtonAdaugaAbonat);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        jDialogAdauga.getContentPane().add(jPanelButoane, gridBagConstraints);
+
+        jDialogSterge.setTitle("Confirmare");
+        jDialogSterge.setResizable(false);
+        jDialogSterge.setSize(new java.awt.Dimension(350, 200));
+
+        jButtonNuSterge.setText("Nu");
+        jButtonNuSterge.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonNuStergeActionPerformed(evt);
+            }
+        });
+
+        jButtonStergeAbonat.setText("Da");
+        jButtonStergeAbonat.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonStergeAbonatActionPerformed(evt);
+            }
+        });
+
+        jLabel5.setText("Sunteti sigur ca doriti sa stergeti abonatul?");
+
+        javax.swing.GroupLayout jDialogStergeLayout = new javax.swing.GroupLayout(jDialogSterge.getContentPane());
+        jDialogSterge.getContentPane().setLayout(jDialogStergeLayout);
+        jDialogStergeLayout.setHorizontalGroup(
+                jDialogStergeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jDialogStergeLayout.createSequentialGroup()
+                                .addGap(53, 53, 53)
+                                .addGroup(jDialogStergeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 276, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGroup(jDialogStergeLayout.createSequentialGroup()
+                                                .addComponent(jButtonNuSterge, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(110, 110, 110)
+                                                .addComponent(jButtonStergeAbonat, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE))))
+        );
+        jDialogStergeLayout.setVerticalGroup(
+                jDialogStergeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jDialogStergeLayout.createSequentialGroup()
+                                .addGap(45, 45, 45)
+                                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(6, 6, 6)
+                                .addGroup(jDialogStergeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jButtonNuSterge)
+                                        .addComponent(jButtonStergeAbonat)))
+        );
+
+        jFrameSplashScreen.setMinimumSize(new java.awt.Dimension(300, 300));
+        jFrameSplashScreen.setUndecorated(true);
+        jFrameSplashScreen.setResizable(false);
+
+        jLabel6.setText("Doru Muntean");
+
+        javax.swing.GroupLayout jFrameSplashScreenLayout = new javax.swing.GroupLayout(jFrameSplashScreen.getContentPane());
+        jFrameSplashScreen.getContentPane().setLayout(jFrameSplashScreenLayout);
+        jFrameSplashScreenLayout.setHorizontalGroup(
+                jFrameSplashScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jFrameSplashScreenLayout.createSequentialGroup()
+                                .addGroup(jFrameSplashScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(jFrameSplashScreenLayout.createSequentialGroup()
+                                                .addGap(96, 96, 96)
+                                                .addComponent(jLabel6))
+                                        .addGroup(jFrameSplashScreenLayout.createSequentialGroup()
+                                                .addGap(74, 74, 74)
+                                                .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addContainerGap(80, Short.MAX_VALUE))
+        );
+        jFrameSplashScreenLayout.setVerticalGroup(
+                jFrameSplashScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jFrameSplashScreenLayout.createSequentialGroup()
+                                .addGap(109, 109, 109)
+                                .addComponent(jLabel6)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 99, Short.MAX_VALUE)
+                                .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(56, 56, 56))
+        );
+
+        jDialogSortare.setTitle("Sortare");
+        jDialogSortare.setMinimumSize(new java.awt.Dimension(300, 200));
+        jDialogSortare.setResizable(false);
+        jDialogSortare.setSize(new java.awt.Dimension(300, 200));
+
+        jLabel7.setText("Sorteaza dupa: ");
+
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
+
+        jButton1.setText("Inapoi");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jButton2.setText("Sorteaza");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jDialogSortareLayout = new javax.swing.GroupLayout(jDialogSortare.getContentPane());
+        jDialogSortare.getContentPane().setLayout(jDialogSortareLayout);
+        jDialogSortareLayout.setHorizontalGroup(
+                jDialogSortareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jDialogSortareLayout.createSequentialGroup()
+                                .addGroup(jDialogSortareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(jDialogSortareLayout.createSequentialGroup()
+                                                .addGap(36, 36, 36)
+                                                .addComponent(jLabel7)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(jDialogSortareLayout.createSequentialGroup()
+                                                .addGap(87, 87, 87)
+                                                .addComponent(jButton1)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(jButton2)))
+                                .addContainerGap(18, Short.MAX_VALUE))
+        );
+        jDialogSortareLayout.setVerticalGroup(
+                jDialogSortareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jDialogSortareLayout.createSequentialGroup()
+                                .addGap(26, 26, 26)
+                                .addGroup(jDialogSortareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel7)
+                                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
+                                .addGroup(jDialogSortareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jButton1)
+                                        .addComponent(jButton2))
+                                .addGap(101, 101, 101))
+        );
+
+        jDialogInregistrare.setTitle("Inregistrare");
+        jDialogInregistrare.setSize(new java.awt.Dimension(300, 200));
+
+        jLabel8.setText("Introduceti codul de inregistrare: ");
+
+        jButton3.setText("Inregistreaza");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
+        jButton4.setText("Inapoi");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jDialogInregistrareLayout = new javax.swing.GroupLayout(jDialogInregistrare.getContentPane());
+        jDialogInregistrare.getContentPane().setLayout(jDialogInregistrareLayout);
+        jDialogInregistrareLayout.setHorizontalGroup(
+                jDialogInregistrareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jDialogInregistrareLayout.createSequentialGroup()
+                                .addGap(43, 43, 43)
+                                .addGroup(jDialogInregistrareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(jDialogInregistrareLayout.createSequentialGroup()
+                                                .addComponent(jButton4)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 43, Short.MAX_VALUE)
+                                                .addComponent(jButton3))
+                                        .addGroup(jDialogInregistrareLayout.createSequentialGroup()
+                                                .addGroup(jDialogInregistrareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(jLabel8))
+                                                .addGap(0, 0, Short.MAX_VALUE)))
+                                .addContainerGap())
+        );
+        jDialogInregistrareLayout.setVerticalGroup(
+                jDialogInregistrareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jDialogInregistrareLayout.createSequentialGroup()
+                                .addGap(26, 26, 26)
+                                .addComponent(jLabel8)
+                                .addGap(18, 18, 18)
+                                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(23, 23, 23)
+                                .addGroup(jDialogInregistrareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jButton3)
+                                        .addComponent(jButton4))
+                                .addContainerGap(62, Short.MAX_VALUE))
+        );
+
+        jDialogModifica.setTitle("Modifica");
+        jDialogModifica.setMinimumSize(new java.awt.Dimension(400, 300));
+        jDialogModifica.setResizable(false);
+        jDialogModifica.getContentPane().setLayout(new java.awt.GridBagLayout());
+
+        jPanelForm1.setLayout(new java.awt.GridBagLayout());
+
+        jLabel9.setText("Nume");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        jPanelForm1.add(jLabel9, gridBagConstraints);
+
+        jTextLastName1.setToolTipText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.ipadx = 190;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 0.6;
+        jPanelForm1.add(jTextLastName1, gridBagConstraints);
+
+        jLabel10.setText("Prenume");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        jPanelForm1.add(jLabel10, gridBagConstraints);
+
+        jTextFirstName1.setToolTipText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.ipadx = 190;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 0.6;
+        jPanelForm1.add(jTextFirstName1, gridBagConstraints);
+
+        jLabel11.setText("CNP");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        jPanelForm1.add(jLabel11, gridBagConstraints);
+
+        jTextCnp1.setToolTipText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.ipadx = 190;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 0.6;
+        jPanelForm1.add(jTextCnp1, gridBagConstraints);
+
+        jLabel12.setText("Telefon");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        jPanelForm1.add(jLabel12, gridBagConstraints);
+
+        jTextPhone1.setToolTipText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.ipadx = 140;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        jPanelForm1.add(jTextPhone1, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        jPanelForm1.add(jComboBoxPhoneType1, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        jDialogModifica.getContentPane().add(jPanelForm1, gridBagConstraints);
+
+        jButtonInchide1.setText("Inchide");
+        jButtonInchide1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonInchide1ActionPerformed(evt);
+            }
+        });
+        jPanelButoane1.add(jButtonInchide1);
+
+        jButtonModificaAbonat.setText("Modifica");
+        jButtonModificaAbonat.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonModificaAbonatActionPerformed(evt);
+            }
+        });
+        jPanelButoane1.add(jButtonModificaAbonat);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        jDialogModifica.getContentPane().add(jPanelButoane1, gridBagConstraints);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -164,12 +701,32 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         jScrollPane1.setViewportView(jTable1);
 
         jButtonAdauga.setText("Adauga");
+        jButtonAdauga.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonAdaugaActionPerformed(evt);
+            }
+        });
 
         jButtonSterge.setText("Sterge");
+        jButtonSterge.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonStergeActionPerformed(evt);
+            }
+        });
 
         jButtonModifica.setText("Modifica");
+        jButtonModifica.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonModificaActionPerformed(evt);
+            }
+        });
 
         jButtonSorteaza.setText("Sorteaza");
+        jButtonSorteaza.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonSorteazaActionPerformed(evt);
+            }
+        });
 
         jButtonIesire.setText("Iesire");
         jButtonIesire.addActionListener(new java.awt.event.ActionListener() {
@@ -193,11 +750,21 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         JMenuOpen.setMnemonic('O');
         JMenuOpen.setText("Open");
         JMenuOpen.setToolTipText("");
+        JMenuOpen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                JMenuOpenActionPerformed(evt);
+            }
+        });
         MeniuFile.add(JMenuOpen);
 
         JMenuSave.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, 0));
         JMenuSave.setMnemonic('S');
         JMenuSave.setText("Save");
+        JMenuSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                JMenuSaveActionPerformed(evt);
+            }
+        });
         MeniuFile.add(JMenuSave);
         MeniuFile.add(Separator);
 
@@ -219,22 +786,37 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         jMenuAdauga.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, 0));
         jMenuAdauga.setMnemonic('A');
         jMenuAdauga.setText("Adauga...");
+        jMenuAdauga.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuAdaugaActionPerformed(evt);
+            }
+        });
         MeniuAbonati.add(jMenuAdauga);
-
-        jMenuCauta.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, 0));
-        jMenuCauta.setMnemonic('C');
-        jMenuCauta.setText("Cauta...");
-        MeniuAbonati.add(jMenuCauta);
 
         jMenuSterge.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, 0));
         jMenuSterge.setMnemonic('S');
         jMenuSterge.setText("Sterge...");
+        jMenuSterge.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuStergeActionPerformed(evt);
+            }
+        });
         MeniuAbonati.add(jMenuSterge);
 
         jMenuModifica.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, 0));
         jMenuModifica.setMnemonic('M');
         jMenuModifica.setText("Modifica...");
+        jMenuModifica.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuModificaActionPerformed(evt);
+            }
+        });
         MeniuAbonati.add(jMenuModifica);
+
+        jMenuCauta.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, 0));
+        jMenuCauta.setMnemonic('C');
+        jMenuCauta.setText("Cauta...");
+        MeniuAbonati.add(jMenuCauta);
 
         MeniuPrincipal.add(MeniuAbonati);
 
@@ -244,6 +826,11 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         jMenuInregistrare.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, 0));
         jMenuInregistrare.setMnemonic('I');
         jMenuInregistrare.setText("Inregistrare");
+        jMenuInregistrare.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuInregistrareActionPerformed(evt);
+            }
+        });
         MeniuHelp.add(jMenuInregistrare);
         MeniuHelp.add(jSeparator1);
 
@@ -264,59 +851,67 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButtonModifica)
-                            .addComponent(jButtonAdauga)
-                            .addComponent(jButtonSterge)
-                            .addComponent(jButtonSorteaza)
-                            .addComponent(jButtonIesire))
-                        .addGap(24, 24, 24)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 427, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabelReclame, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(224, 224, 224)
-                        .addComponent(jLabelCauta)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField1)))
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addComponent(jButtonModifica)
+                                                                        .addComponent(jButtonAdauga)
+                                                                        .addComponent(jButtonSterge)
+                                                                        .addComponent(jButtonSorteaza)
+                                                                        .addComponent(jButtonIesire))
+                                                                .addGap(24, 24, 24))
+                                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                                .addComponent(jLabelSalvare, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addContainerGap()
+                                                .addComponent(jLabelReclame, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGap(224, 224, 224)
+                                                .addComponent(jLabelCauta)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(jTextField1)))
+                                .addContainerGap())
         );
 
-        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jButtonAdauga, jButtonIesire, jButtonModifica, jButtonSorteaza, jButtonSterge});
+        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[]{jButtonAdauga, jButtonIesire, jButtonModifica, jButtonSorteaza, jButtonSterge});
 
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButtonAdauga)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButtonSterge)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButtonModifica)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButtonSorteaza)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButtonIesire))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabelCauta))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabelReclame, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(jButtonAdauga)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(jButtonSterge)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(jButtonModifica)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(jButtonSorteaza)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addComponent(jLabelSalvare, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jButtonIesire))
+                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabelCauta))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabelReclame, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap())
         );
 
-        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jButtonAdauga, jButtonIesire, jButtonModifica, jButtonSorteaza, jButtonSterge});
+        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[]{jButtonAdauga, jButtonIesire, jButtonModifica, jButtonSorteaza, jButtonSterge});
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonIesireActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonIesireActionPerformed
@@ -329,23 +924,221 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         jDialogIesire.setVisible(true);
     }//GEN-LAST:event_JMenuIesireActionPerformed
 
-    private void jButtonDaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDaActionPerformed
-        //TODO - salveaza date
-        System.exit(0);
-    }//GEN-LAST:event_jButtonDaActionPerformed
-
-    private void jButtonNuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonNuActionPerformed
-        jDialogIesire.dispose();
-    }//GEN-LAST:event_jButtonNuActionPerformed
-
     private void jButtonOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOkActionPerformed
         jDialogAbout.dispose();
     }//GEN-LAST:event_jButtonOkActionPerformed
 
     private void jMenuAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuAboutActionPerformed
-        jDialogIesire.setLocationRelativeTo(null);
+        jDialogAbout.setLocationRelativeTo(null);
         jDialogAbout.setVisible(true);
     }//GEN-LAST:event_jMenuAboutActionPerformed
+
+    private void JMenuOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JMenuOpenActionPerformed
+        jFileChooser1.setAcceptAllFileFilterUsed(false);
+        jFileChooser1.setFileFilter(new FileNameExtensionFilter("*.agd", "agd"));
+        jFileChooser1.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+        try {
+            if (jFileChooser1.showOpenDialog(this) == jFileChooser1.APPROVE_OPTION) {
+                File fisierSelectat = jFileChooser1.getSelectedFile();
+                String testExt = fisierSelectat.toString();
+                if (!testExt.endsWith(".agd")) {
+                    throw new IOException("Fisierul selectat nu are extensia '.agd'");
+                } else {
+//                    if (fisierSelectat.exists() && fisierSelectat.isFile() && fisierSelectat.canRead()) {
+//                    ObjectInputStream ois;
+//                    try (FileInputStream fis = new FileInputStream(fisierSelectat)) {
+//                        ois = new ObjectInputStream(fis);
+//                        m = (CarteDeTelefon) ois.readObject();
+//                        jTable1.setModel(m);
+//                        rowSorter = new TableRowSorter<>(jTable1.getModel());
+//                        jTable1.setRowSorter(rowSorter);
+//                        volatilePath = fisierSelectat;
+//                    }
+//                    ois.close();
+//                    }
+                }
+            }
+        } catch (IOException e) {
+//            eroare("Incarcare fisier nereusita: " + e);
+//        } catch (HeadlessException | ClassNotFoundException e){
+//            eroare(e);
+        }
+    }//GEN-LAST:event_JMenuOpenActionPerformed
+
+    private void JMenuSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JMenuSaveActionPerformed
+        jFileChooser1.setAcceptAllFileFilterUsed(false);
+        jFileChooser1.setFileFilter(new FileNameExtensionFilter("*.agd", "agd"));
+        jFileChooser1.setFileSelectionMode(JFileChooser.FILES_ONLY);
+//        save(m);
+    }//GEN-LAST:event_JMenuSaveActionPerformed
+
+    private void jMenuAdaugaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuAdaugaActionPerformed
+        jDialogAdauga.setLocationRelativeTo(null);
+        jDialogAdauga.setVisible(true);
+    }//GEN-LAST:event_jMenuAdaugaActionPerformed
+
+    private void jButtonAdaugaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAdaugaActionPerformed
+        jDialogAdauga.setLocationRelativeTo(null);
+        jDialogAdauga.setVisible(true);
+    }//GEN-LAST:event_jButtonAdaugaActionPerformed
+
+    private void jButtonInchideActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonInchideActionPerformed
+        resetAddFields();
+        jDialogAdauga.dispose();
+    }//GEN-LAST:event_jButtonInchideActionPerformed
+
+    private void jDialogAdaugaWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_jDialogAdaugaWindowClosing
+        resetAddFields();
+    }//GEN-LAST:event_jDialogAdaugaWindowClosing
+
+    private void jButtonNuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonNuActionPerformed
+        jDialogIesire.dispose();
+    }//GEN-LAST:event_jButtonNuActionPerformed
+
+    private void jButtonDaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDaActionPerformed
+        //TODO - salveaza date
+        System.exit(0);
+    }//GEN-LAST:event_jButtonDaActionPerformed
+
+    private void jButtonAdaugaAbonatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAdaugaAbonatActionPerformed
+        try {
+            String nume = jTextLastName.getText();
+            String prenume = jTextFirstName.getText();
+            String cnp = jTextCnp.getText();
+            String telefon = jTextPhone.getText();
+            //TipTelefon tipTelefon = TipTelefon.FIX;
+            NrTel nrTel = new NrMobil(telefon);
+
+            Abonat abonat = new Abonat(nume, prenume, cnp, nrTel);
+
+            model.adaugaAbonat(abonat);
+
+        } catch (IllegalArgumentException e) {
+            //eroare(e.getMessage());
+        }
+
+    }//GEN-LAST:event_jButtonAdaugaAbonatActionPerformed
+
+    private void jButtonNuStergeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonNuStergeActionPerformed
+        jDialogSterge.dispose();
+    }//GEN-LAST:event_jButtonNuStergeActionPerformed
+
+    private void jButtonStergeAbonatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonStergeAbonatActionPerformed
+
+        //TODO - verificare daca e selectat abonat - vezi creare metoda mai jos la jMenuStergeActionPerformed
+        int selected = jTable1.getSelectedRow();
+
+        model.stergeAbonat(model.getElementAt(selected));
+        jDialogSterge.dispose();
+    }//GEN-LAST:event_jButtonStergeAbonatActionPerformed
+
+    private void jButtonStergeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonStergeActionPerformed
+        int selected = jTable1.getSelectedRow();
+        if (selected == -1 || jTable1.getColumnCount() == 0) {
+            //TODO - dialog box - nu ati selectat un abonat! instead fo this exception
+            //throw new IllegalStateException("bla bla");
+            JOptionPane.showMessageDialog(null, "Nu ati selectat un abonat!", "Eroare", JOptionPane.ERROR_MESSAGE);
+        } else {
+            jDialogSterge.setLocationRelativeTo(null);
+            jDialogSterge.setVisible(true);
+        }
+
+    }//GEN-LAST:event_jButtonStergeActionPerformed
+
+    private void jMenuStergeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuStergeActionPerformed
+        //TODO - add metoda de verificare index care deschide un dialog box
+        //ca sa nu mai repet codul si la celalalt buton de sus (meniu si buton sterge
+        int selected = jTable1.getSelectedRow();
+        if (selected == -1 || jTable1.getColumnCount() == 0) {
+            //TODO - dialog box - nu ati selectat un abonat! instead fo this exception
+            //throw new IllegalStateException("bla bla");
+            //custom title, error icon
+            JOptionPane.showMessageDialog(null, "Nu ati selectat un abonat!", "Eroare", JOptionPane.ERROR_MESSAGE);
+        } else {
+            jDialogSterge.setLocationRelativeTo(null);
+            jDialogSterge.setVisible(true);
+        }
+
+    }//GEN-LAST:event_jMenuStergeActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        jDialogSortare.dispose();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButtonSorteazaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSorteazaActionPerformed
+        jDialogSortare.setLocationRelativeTo(null);
+        jDialogSortare.setVisible(true);
+    }//GEN-LAST:event_jButtonSorteazaActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        model.sortare(1, 'a');
+        jDialogSortare.setVisible(false);
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        jDialogInregistrare.dispose();
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jMenuInregistrareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuInregistrareActionPerformed
+        jDialogInregistrare.setLocationRelativeTo(null);
+        jDialogInregistrare.setVisible(true);
+    }//GEN-LAST:event_jMenuInregistrareActionPerformed
+
+    private void jButtonInchide1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonInchide1ActionPerformed
+        jDialogModifica.setVisible(false);
+    }//GEN-LAST:event_jButtonInchide1ActionPerformed
+
+    private void jButtonModificaAbonatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonModificaAbonatActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButtonModificaAbonatActionPerformed
+
+    private void jButtonModificaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonModificaActionPerformed
+        int selected = jTable1.getSelectedRow();
+        if (selected == -1 || jTable1.getColumnCount() == 0) {
+            //TODO - dialog box - nu ati selectat un abonat! instead fo this exception
+            //throw new IllegalStateException("bla bla");
+            JOptionPane.showMessageDialog(null, "Nu ati selectat un abonat!", "Eroare", JOptionPane.ERROR_MESSAGE);
+        } else {
+            jDialogModifica.setLocationRelativeTo(null);
+            jDialogModifica.setVisible(true);
+
+
+            //TODO - replace this stupid repeat
+            Abonat abonat = model.getElementAt(selected);
+            jTextLastName1.setText(abonat.getNume());
+            jTextFirstName1.setText(abonat.getPrenume());
+            jTextCnp1.setText(abonat.getCnp());
+            jTextPhone1.setText(abonat.getTelefon().toString());
+            //TODO add - phone type
+        }
+    }//GEN-LAST:event_jButtonModificaActionPerformed
+
+    private void jMenuModificaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuModificaActionPerformed
+        int selected = jTable1.getSelectedRow();
+        if (selected == -1 || jTable1.getColumnCount() == 0) {
+            //TODO - dialog box - nu ati selectat un abonat! instead fo this exception
+            //throw new IllegalStateException("bla bla");
+            JOptionPane.showMessageDialog(null, "Nu ati selectat un abonat!", "Eroare", JOptionPane.ERROR_MESSAGE);
+        } else {
+            jDialogModifica.setLocationRelativeTo(null);
+            jDialogModifica.setVisible(true);
+
+            //TODO - replace this stupid repeat
+            Abonat abonat = model.getElementAt(selected);
+            jTextLastName1.setText(abonat.getNume());
+            jTextFirstName1.setText(abonat.getPrenume());
+            jTextCnp1.setText(abonat.getCnp());
+            jTextPhone1.setText(abonat.getTelefon().toString());
+            //TODO add - phone type
+
+        }
+    }//GEN-LAST:event_jMenuModificaActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        //TODO check if the code is correct then stop the commercials
+        reclame.opresteReclame();
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -373,7 +1166,11 @@ public class FereastraPrincipala extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(FereastraPrincipala.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
+    
+        
+          
+        
+        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -391,30 +1188,83 @@ public class FereastraPrincipala extends javax.swing.JFrame {
     private javax.swing.JMenu MeniuHelp;
     private javax.swing.JMenuBar MeniuPrincipal;
     private javax.swing.JPopupMenu.Separator Separator;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JButton jButtonAdauga;
+    private javax.swing.JButton jButtonAdaugaAbonat;
     private javax.swing.JButton jButtonDa;
     private javax.swing.JButton jButtonIesire;
+    private javax.swing.JButton jButtonInchide;
+    private javax.swing.JButton jButtonInchide1;
     private javax.swing.JButton jButtonModifica;
+    private javax.swing.JButton jButtonModificaAbonat;
     private javax.swing.JButton jButtonNu;
+    private javax.swing.JButton jButtonNuSterge;
     private javax.swing.JButton jButtonOk;
     private javax.swing.JButton jButtonSorteaza;
     private javax.swing.JButton jButtonSterge;
+    private javax.swing.JButton jButtonStergeAbonat;
+    private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JComboBox<String> jComboBoxPhoneType;
+    private javax.swing.JComboBox<String> jComboBoxPhoneType1;
     private javax.swing.JDialog jDialogAbout;
+    private javax.swing.JDialog jDialogAdauga;
     private javax.swing.JDialog jDialogIesire;
+    private javax.swing.JDialog jDialogInregistrare;
+    private javax.swing.JDialog jDialogModifica;
+    private javax.swing.JDialog jDialogSortare;
+    private javax.swing.JDialog jDialogSterge;
+    private javax.swing.JFileChooser jFileChooser1;
+    private javax.swing.JFrame jFrameSplashScreen;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JLabel jLabelAgenda;
     private javax.swing.JLabel jLabelCauta;
     private javax.swing.JLabel jLabelConfirmare;
     private javax.swing.JLabel jLabelNume;
     private javax.swing.JLabel jLabelReclame;
+    private javax.swing.JLabel jLabelSalvare;
     private javax.swing.JMenuItem jMenuAbout;
     private javax.swing.JMenuItem jMenuAdauga;
     private javax.swing.JMenuItem jMenuCauta;
     private javax.swing.JMenuItem jMenuInregistrare;
     private javax.swing.JMenuItem jMenuModifica;
     private javax.swing.JMenuItem jMenuSterge;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanelButoane;
+    private javax.swing.JPanel jPanelButoane1;
+    private javax.swing.JPanel jPanelForm;
+    private javax.swing.JPanel jPanelForm1;
+    private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JTable jTable1;
+    private javax.swing.JTextField jTextCnp;
+    private javax.swing.JTextField jTextCnp1;
     private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextField2;
+    private javax.swing.JTextField jTextFirstName;
+    private javax.swing.JTextField jTextFirstName1;
+    private javax.swing.JTextField jTextLastName;
+    private javax.swing.JTextField jTextLastName1;
+    private javax.swing.JTextField jTextPhone;
+    private javax.swing.JTextField jTextPhone1;
     // End of variables declaration//GEN-END:variables
 }
+
+

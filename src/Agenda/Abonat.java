@@ -5,10 +5,13 @@
  */
 package Agenda;
 
+import java.io.Serializable;
+import java.util.Comparator;
+
 /**
  * @author dorumuntean
  */
-public class Abonat {
+public class Abonat implements Serializable /*, Comparator */ {
 
     private NrTel telefon;
     private String nume;
@@ -19,15 +22,20 @@ public class Abonat {
     //StringUtils.capitalize(Str);
 
 
-    public Abonat(NrTel telefon, String nume, String prenume, String cnp) {
+    public Abonat(String nume, String prenume, String cnp, NrTel telefon) {
 
         valideazaNumeSauPrenume(nume, Apelativ.NUME);
         valideazaNumeSauPrenume(prenume, Apelativ.PRENUME);
 
-        this.telefon = telefon;
         this.nume = nume;
         this.prenume = prenume;
         this.cnp = cnp;
+        this.telefon = telefon;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Nume: %s Prenume: %s CNP: %s Telefon: %s", nume, prenume, cnp, telefon);
     }
 
     public NrTel getTelefon() {
@@ -72,7 +80,57 @@ public class Abonat {
         }
 
         if (numeSauPrenume.matches("([0-9])")) {
-            throw new IllegalArgumentException(String.format("Campul %s trebuie sa contina doar litere"));
+            throw new IllegalArgumentException(String.format("Campul %s trebuie sa contina doar litere", apelativ.name().toLowerCase()));
         }
     }
+
+//    @Override
+//    public int compare(Object o1, Object o2) {
+//        //TODO
+//    }
+
+
+    public static Comparator<Abonat> dupaNume() {
+
+        //return (Abonat a1, Abonat a2) -> a1.getNume().compareToIgnoreCase(a2.getNume());
+
+        return new Comparator<Abonat>() {
+            @Override
+            public int compare(Abonat a1, Abonat a2) {
+                return a1.getNume().compareToIgnoreCase(a2.getNume());
+            }
+        };
+    }
+
+
+    public static Comparator<Abonat> dupaPrenume() {
+
+        return new Comparator<Abonat>() {
+            @Override
+            public int compare(Abonat a1, Abonat a2) {
+                return a1.getPrenume().compareToIgnoreCase(a2.getPrenume());
+            }
+        };
+    }
+
+    public static Comparator<Abonat> dupaCnp() {
+
+        return new Comparator<Abonat>() {
+            @Override
+            public int compare(Abonat a1, Abonat a2) {
+                return a1.getCnp().compareToIgnoreCase(a2.getCnp());
+            }
+        };
+    }
+
+    public static Comparator<Abonat> dupaTelefon() {
+
+        return new Comparator<Abonat>() {
+            @Override
+            public int compare(Abonat a1, Abonat a2) {
+                return a1.getTelefon().toString().compareToIgnoreCase(a2.getTelefon().toString());
+            }
+        };
+    }
+
 }

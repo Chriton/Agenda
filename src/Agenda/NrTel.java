@@ -21,6 +21,7 @@ public abstract class NrTel implements Serializable, Comparator {
         this.tipTelefon = tipTelefon;
     }
 
+    @Override
     public String toString() {
         return numar;
     }
