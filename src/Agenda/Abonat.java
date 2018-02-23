@@ -20,7 +20,7 @@ public class Abonat implements Serializable /*, Comparator */ {
 
     //org.apache.commons.lang.StringUtils
     //StringUtils.capitalize(Str);
-
+    //test
 
     public Abonat(String nume, String prenume, String cnp, NrTel telefon) {
 
