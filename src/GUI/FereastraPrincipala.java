@@ -7,24 +7,39 @@ package GUI;
 
 import Agenda.Abonat;
 import Agenda.CarteDeTelefon;
+import Agenda.Enums.Directie;
 import Agenda.NrFix;
 import Agenda.NrMobil;
 import Agenda.NrTel;
+import Agenda.Enums.SortareDupa;
 import Reclame.TaskReclame;
-import Agenda.TipTelefon;
-import Exceptii.SaveException;
+import Agenda.Enums.TipTelefon;
 import Reclame.TimerReclame;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Stream;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
+
 
 /**
  * @author dorumuntean
@@ -34,6 +49,8 @@ public class FereastraPrincipala extends javax.swing.JFrame {
 
     private CarteDeTelefon model = new CarteDeTelefon();
     TimerReclame reclame;
+    TableRowSorter<TableModel> sorter;
+
 
     /**
      * Creates new form FereastraPrincipala
@@ -41,18 +58,38 @@ public class FereastraPrincipala extends javax.swing.JFrame {
     public FereastraPrincipala() {
         initComponents();
 
-        //TODO verifica inregistrare aplicatie
-
-
-        //TODO add model
-        //incarcare date si setare in tabel
-        //model = incarcareInfoAuto();
-        jTable1.setModel(model);
-        jTable1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
+        //TODO check if the user is registered, if not start the commercials
         reclame = new TimerReclame(jLabelReclame);
         reclame.pornesteReclame();
 
+        //TODO incarcare date automat din fisier default
+
+        //setare model tabel cu abonati
+        jTable1.setModel(model);
+        jTable1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        //Combo box tip telefon
+        DefaultComboBoxModel tipuriTelefon = new DefaultComboBoxModel(TipTelefon.lista());
+        jComboBoxPhoneType1.setModel(tipuriTelefon);
+        jComboBoxPhoneType.setModel(tipuriTelefon);
+
+
+        //Combo box - sortare dupa
+        DefaultComboBoxModel modelSortare = new DefaultComboBoxModel(SortareDupa.lista());
+        jComboBoxSortare.setModel(modelSortare);
+
+        //Combo box - directie sortare
+        DefaultComboBoxModel modelDirectieSortare = new DefaultComboBoxModel(Directie.lista());
+        jComboBoxDirectieSortare.setModel(modelDirectieSortare);
+
+        //Pentru sortare prin click pe cap tabel
+        sorter = new TableRowSorter<TableModel>(jTable1.getModel());
+        jTable1.setRowSorter(sorter);
+
+        //Filtru pentru FileChooser
+        jFileChooser1.setFileFilter(new FileNameExtensionFilter("*.agd", "agd"));
+        
+        //TODO - 5min save
         fiveMinSave();
     }
 
@@ -81,18 +118,6 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         }, 10000, 60000);
     }
 
-    /**
-     * Deschide fereastra Save si incearca salvarea agendei
-     */
-    public void save(CarteDeTelefon carteDeTelefon) {
-        if (jFileChooser1.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
-            try {
-                //TODO
-            } catch (SaveException se) {
-                //TODO
-            }
-        }
-    }
 
     /**
      * Reseteaza campurile din fereastra Adauga abonat
@@ -116,8 +141,8 @@ public class FereastraPrincipala extends javax.swing.JFrame {
 
         jDialogIesire = new javax.swing.JDialog();
         jPanel1 = new javax.swing.JPanel();
-        jButtonDa = new javax.swing.JButton();
         jButtonNu = new javax.swing.JButton();
+        jButtonDa = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jLabelConfirmare = new javax.swing.JLabel();
         jDialogAbout = new javax.swing.JDialog();
@@ -150,9 +175,11 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         jProgressBar1 = new javax.swing.JProgressBar();
         jDialogSortare = new javax.swing.JDialog();
         jLabel7 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        jComboBoxSortare = new javax.swing.JComboBox<>();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
+        jComboBoxDirectieSortare = new javax.swing.JComboBox<>();
+        jLabel13 = new javax.swing.JLabel();
         jDialogInregistrare = new javax.swing.JDialog();
         jLabel8 = new javax.swing.JLabel();
         jTextField2 = new javax.swing.JTextField();
@@ -207,14 +234,6 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         jDialogIesire.setSize(new java.awt.Dimension(300, 200));
         jDialogIesire.getContentPane().setLayout(new java.awt.GridBagLayout());
 
-        jButtonDa.setText("DA");
-        jButtonDa.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonDaActionPerformed(evt);
-            }
-        });
-        jPanel1.add(jButtonDa);
-
         jButtonNu.setText("NU");
         jButtonNu.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -222,6 +241,14 @@ public class FereastraPrincipala extends javax.swing.JFrame {
             }
         });
         jPanel1.add(jButtonNu);
+
+        jButtonDa.setText("DA");
+        jButtonDa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonDaActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButtonDa);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -244,6 +271,7 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         jDialogAbout.setTitle("About");
         jDialogAbout.setLocation(new java.awt.Point(0, 0));
         jDialogAbout.setMinimumSize(new java.awt.Dimension(300, 300));
+        jDialogAbout.setModal(true);
         jDialogAbout.setResizable(false);
         jDialogAbout.setSize(new java.awt.Dimension(300, 300));
         jDialogAbout.getContentPane().setLayout(new java.awt.GridBagLayout());
@@ -272,22 +300,22 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
-                jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 116, Short.MAX_VALUE)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(jPanel3Layout.createSequentialGroup()
-                                        .addGap(0, 0, Short.MAX_VALUE)
-                                        .addComponent(jButtonOk)
-                                        .addGap(0, 0, Short.MAX_VALUE)))
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 116, Short.MAX_VALUE)
+            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel3Layout.createSequentialGroup()
+                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addComponent(jButtonOk)
+                    .addGap(0, 0, Short.MAX_VALUE)))
         );
         jPanel3Layout.setVerticalGroup(
-                jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 100, Short.MAX_VALUE)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(jPanel3Layout.createSequentialGroup()
-                                        .addGap(0, 0, Short.MAX_VALUE)
-                                        .addComponent(jButtonOk)
-                                        .addGap(0, 0, Short.MAX_VALUE)))
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel3Layout.createSequentialGroup()
+                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addComponent(jButtonOk)
+                    .addGap(0, 0, Short.MAX_VALUE)))
         );
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -296,8 +324,13 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         jDialogAbout.getContentPane().add(jPanel3, gridBagConstraints);
 
+        jFileChooser1.setAcceptAllFileFilterUsed(false);
+        jFileChooser1.setDialogTitle("");
+
+        jDialogAdauga.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         jDialogAdauga.setTitle("Adauga");
         jDialogAdauga.setMinimumSize(new java.awt.Dimension(400, 300));
+        jDialogAdauga.setModal(true);
         jDialogAdauga.setResizable(false);
         jDialogAdauga.addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
@@ -408,7 +441,9 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         jDialogAdauga.getContentPane().add(jPanelButoane, gridBagConstraints);
 
+        jDialogSterge.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         jDialogSterge.setTitle("Confirmare");
+        jDialogSterge.setModal(true);
         jDialogSterge.setResizable(false);
         jDialogSterge.setSize(new java.awt.Dimension(350, 200));
 
@@ -431,27 +466,28 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         javax.swing.GroupLayout jDialogStergeLayout = new javax.swing.GroupLayout(jDialogSterge.getContentPane());
         jDialogSterge.getContentPane().setLayout(jDialogStergeLayout);
         jDialogStergeLayout.setHorizontalGroup(
-                jDialogStergeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jDialogStergeLayout.createSequentialGroup()
-                                .addGap(53, 53, 53)
-                                .addGroup(jDialogStergeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 276, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGroup(jDialogStergeLayout.createSequentialGroup()
-                                                .addComponent(jButtonNuSterge, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(110, 110, 110)
-                                                .addComponent(jButtonStergeAbonat, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE))))
+            jDialogStergeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jDialogStergeLayout.createSequentialGroup()
+                .addGap(53, 53, 53)
+                .addGroup(jDialogStergeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 276, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jDialogStergeLayout.createSequentialGroup()
+                        .addComponent(jButtonNuSterge, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(110, 110, 110)
+                        .addComponent(jButtonStergeAbonat, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE))))
         );
         jDialogStergeLayout.setVerticalGroup(
-                jDialogStergeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jDialogStergeLayout.createSequentialGroup()
-                                .addGap(45, 45, 45)
-                                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(6, 6, 6)
-                                .addGroup(jDialogStergeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jButtonNuSterge)
-                                        .addComponent(jButtonStergeAbonat)))
+            jDialogStergeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jDialogStergeLayout.createSequentialGroup()
+                .addGap(45, 45, 45)
+                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(6, 6, 6)
+                .addGroup(jDialogStergeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButtonNuSterge)
+                    .addComponent(jButtonStergeAbonat)))
         );
 
+        jFrameSplashScreen.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         jFrameSplashScreen.setMinimumSize(new java.awt.Dimension(300, 300));
         jFrameSplashScreen.setUndecorated(true);
         jFrameSplashScreen.setResizable(false);
@@ -461,35 +497,35 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         javax.swing.GroupLayout jFrameSplashScreenLayout = new javax.swing.GroupLayout(jFrameSplashScreen.getContentPane());
         jFrameSplashScreen.getContentPane().setLayout(jFrameSplashScreenLayout);
         jFrameSplashScreenLayout.setHorizontalGroup(
-                jFrameSplashScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jFrameSplashScreenLayout.createSequentialGroup()
-                                .addGroup(jFrameSplashScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(jFrameSplashScreenLayout.createSequentialGroup()
-                                                .addGap(96, 96, 96)
-                                                .addComponent(jLabel6))
-                                        .addGroup(jFrameSplashScreenLayout.createSequentialGroup()
-                                                .addGap(74, 74, 74)
-                                                .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addContainerGap(80, Short.MAX_VALUE))
+            jFrameSplashScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jFrameSplashScreenLayout.createSequentialGroup()
+                .addGroup(jFrameSplashScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jFrameSplashScreenLayout.createSequentialGroup()
+                        .addGap(96, 96, 96)
+                        .addComponent(jLabel6))
+                    .addGroup(jFrameSplashScreenLayout.createSequentialGroup()
+                        .addGap(74, 74, 74)
+                        .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(80, Short.MAX_VALUE))
         );
         jFrameSplashScreenLayout.setVerticalGroup(
-                jFrameSplashScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jFrameSplashScreenLayout.createSequentialGroup()
-                                .addGap(109, 109, 109)
-                                .addComponent(jLabel6)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 99, Short.MAX_VALUE)
-                                .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(56, 56, 56))
+            jFrameSplashScreenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jFrameSplashScreenLayout.createSequentialGroup()
+                .addGap(109, 109, 109)
+                .addComponent(jLabel6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 99, Short.MAX_VALUE)
+                .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(56, 56, 56))
         );
 
+        jDialogSortare.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         jDialogSortare.setTitle("Sortare");
         jDialogSortare.setMinimumSize(new java.awt.Dimension(300, 200));
+        jDialogSortare.setModal(true);
         jDialogSortare.setResizable(false);
         jDialogSortare.setSize(new java.awt.Dimension(300, 200));
 
         jLabel7.setText("Sorteaza dupa: ");
-
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
 
         jButton1.setText("Inapoi");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -505,39 +541,51 @@ public class FereastraPrincipala extends javax.swing.JFrame {
             }
         });
 
+        jLabel13.setText("Directie");
+
         javax.swing.GroupLayout jDialogSortareLayout = new javax.swing.GroupLayout(jDialogSortare.getContentPane());
         jDialogSortare.getContentPane().setLayout(jDialogSortareLayout);
         jDialogSortareLayout.setHorizontalGroup(
-                jDialogSortareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jDialogSortareLayout.createSequentialGroup()
-                                .addGroup(jDialogSortareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(jDialogSortareLayout.createSequentialGroup()
-                                                .addGap(36, 36, 36)
-                                                .addComponent(jLabel7)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGroup(jDialogSortareLayout.createSequentialGroup()
-                                                .addGap(87, 87, 87)
-                                                .addComponent(jButton1)
-                                                .addGap(18, 18, 18)
-                                                .addComponent(jButton2)))
-                                .addContainerGap(18, Short.MAX_VALUE))
+            jDialogSortareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jDialogSortareLayout.createSequentialGroup()
+                .addGroup(jDialogSortareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jDialogSortareLayout.createSequentialGroup()
+                        .addGap(87, 87, 87)
+                        .addComponent(jButton1)
+                        .addGap(18, 18, 18)
+                        .addComponent(jButton2))
+                    .addGroup(jDialogSortareLayout.createSequentialGroup()
+                        .addGap(36, 36, 36)
+                        .addGroup(jDialogSortareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel7)
+                            .addComponent(jLabel13))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jDialogSortareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jComboBoxSortare, 0, 131, Short.MAX_VALUE)
+                            .addComponent(jComboBoxDirectieSortare, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addContainerGap(231, Short.MAX_VALUE))
         );
         jDialogSortareLayout.setVerticalGroup(
-                jDialogSortareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jDialogSortareLayout.createSequentialGroup()
-                                .addGap(26, 26, 26)
-                                .addGroup(jDialogSortareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel7)
-                                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
-                                .addGroup(jDialogSortareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jButton1)
-                                        .addComponent(jButton2))
-                                .addGap(101, 101, 101))
+            jDialogSortareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jDialogSortareLayout.createSequentialGroup()
+                .addGap(26, 26, 26)
+                .addGroup(jDialogSortareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel7)
+                    .addComponent(jComboBoxSortare, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jDialogSortareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jComboBoxDirectieSortare, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel13))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 134, Short.MAX_VALUE)
+                .addGroup(jDialogSortareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton1)
+                    .addComponent(jButton2))
+                .addGap(101, 101, 101))
         );
 
+        jDialogInregistrare.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         jDialogInregistrare.setTitle("Inregistrare");
+        jDialogInregistrare.setModal(true);
         jDialogInregistrare.setSize(new java.awt.Dimension(300, 200));
 
         jLabel8.setText("Introduceti codul de inregistrare: ");
@@ -559,37 +607,39 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         javax.swing.GroupLayout jDialogInregistrareLayout = new javax.swing.GroupLayout(jDialogInregistrare.getContentPane());
         jDialogInregistrare.getContentPane().setLayout(jDialogInregistrareLayout);
         jDialogInregistrareLayout.setHorizontalGroup(
-                jDialogInregistrareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jDialogInregistrareLayout.createSequentialGroup()
-                                .addGap(43, 43, 43)
-                                .addGroup(jDialogInregistrareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(jDialogInregistrareLayout.createSequentialGroup()
-                                                .addComponent(jButton4)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 43, Short.MAX_VALUE)
-                                                .addComponent(jButton3))
-                                        .addGroup(jDialogInregistrareLayout.createSequentialGroup()
-                                                .addGroup(jDialogInregistrareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addComponent(jLabel8))
-                                                .addGap(0, 0, Short.MAX_VALUE)))
-                                .addContainerGap())
+            jDialogInregistrareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jDialogInregistrareLayout.createSequentialGroup()
+                .addGap(43, 43, 43)
+                .addGroup(jDialogInregistrareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jDialogInregistrareLayout.createSequentialGroup()
+                        .addComponent(jButton4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 43, Short.MAX_VALUE)
+                        .addComponent(jButton3))
+                    .addGroup(jDialogInregistrareLayout.createSequentialGroup()
+                        .addGroup(jDialogInregistrareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel8))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         jDialogInregistrareLayout.setVerticalGroup(
-                jDialogInregistrareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jDialogInregistrareLayout.createSequentialGroup()
-                                .addGap(26, 26, 26)
-                                .addComponent(jLabel8)
-                                .addGap(18, 18, 18)
-                                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(23, 23, 23)
-                                .addGroup(jDialogInregistrareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jButton3)
-                                        .addComponent(jButton4))
-                                .addContainerGap(62, Short.MAX_VALUE))
+            jDialogInregistrareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jDialogInregistrareLayout.createSequentialGroup()
+                .addGap(26, 26, 26)
+                .addComponent(jLabel8)
+                .addGap(18, 18, 18)
+                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(23, 23, 23)
+                .addGroup(jDialogInregistrareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton3)
+                    .addComponent(jButton4))
+                .addContainerGap(62, Short.MAX_VALUE))
         );
 
+        jDialogModifica.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         jDialogModifica.setTitle("Modifica");
         jDialogModifica.setMinimumSize(new java.awt.Dimension(400, 300));
+        jDialogModifica.setModal(true);
         jDialogModifica.setResizable(false);
         jDialogModifica.getContentPane().setLayout(new java.awt.GridBagLayout());
 
@@ -735,7 +785,8 @@ public class FereastraPrincipala extends javax.swing.JFrame {
             }
         });
 
-        jLabelReclame.setText("Reclame");
+        jLabelReclame.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabelReclame.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Reclame/Poze/reclama1.png"))); // NOI18N
 
         jLabelCauta.setText("Cauta");
 
@@ -851,64 +902,64 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addGroup(layout.createSequentialGroup()
-                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                                        .addComponent(jButtonModifica)
-                                                                        .addComponent(jButtonAdauga)
-                                                                        .addComponent(jButtonSterge)
-                                                                        .addComponent(jButtonSorteaza)
-                                                                        .addComponent(jButtonIesire))
-                                                                .addGap(24, 24, 24))
-                                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                                                .addComponent(jLabelSalvare, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
-                                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE))
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addContainerGap()
-                                                .addComponent(jLabelReclame, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addGap(224, 224, 224)
-                                                .addComponent(jLabelCauta)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(jTextField1)))
-                                .addContainerGap())
+                                    .addComponent(jButtonModifica)
+                                    .addComponent(jButtonAdauga)
+                                    .addComponent(jButtonSterge)
+                                    .addComponent(jButtonSorteaza)
+                                    .addComponent(jButtonIesire))
+                                .addGap(24, 24, 24))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(jLabelSalvare, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabelReclame, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(224, 224, 224)
+                        .addComponent(jLabelCauta)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTextField1)))
+                .addContainerGap())
         );
 
-        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[]{jButtonAdauga, jButtonIesire, jButtonModifica, jButtonSorteaza, jButtonSterge});
+        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jButtonAdauga, jButtonIesire, jButtonModifica, jButtonSorteaza, jButtonSterge});
 
         layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(jButtonAdauga)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(jButtonSterge)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(jButtonModifica)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(jButtonSorteaza)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addComponent(jLabelSalvare, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(jButtonIesire))
-                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jLabelCauta))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jLabelReclame, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap())
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jButtonAdauga)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButtonSterge)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButtonModifica)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButtonSorteaza)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabelSalvare, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jButtonIesire))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabelCauta))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabelReclame, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
-        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[]{jButtonAdauga, jButtonIesire, jButtonModifica, jButtonSorteaza, jButtonSterge});
+        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jButtonAdauga, jButtonIesire, jButtonModifica, jButtonSorteaza, jButtonSterge});
 
         pack();
         setLocationRelativeTo(null);
@@ -934,53 +985,49 @@ public class FereastraPrincipala extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuAboutActionPerformed
 
     private void JMenuOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JMenuOpenActionPerformed
-        jFileChooser1.setAcceptAllFileFilterUsed(false);
-        jFileChooser1.setFileFilter(new FileNameExtensionFilter("*.agd", "agd"));
-        jFileChooser1.setFileSelectionMode(JFileChooser.FILES_ONLY);
-
         try {
             if (jFileChooser1.showOpenDialog(this) == jFileChooser1.APPROVE_OPTION) {
                 File fisierSelectat = jFileChooser1.getSelectedFile();
-                String testExt = fisierSelectat.toString();
-                if (!testExt.endsWith(".agd")) {
-                    throw new IOException("Fisierul selectat nu are extensia '.agd'");
-                } else {
-//                    if (fisierSelectat.exists() && fisierSelectat.isFile() && fisierSelectat.canRead()) {
-//                    ObjectInputStream ois;
-//                    try (FileInputStream fis = new FileInputStream(fisierSelectat)) {
-//                        ois = new ObjectInputStream(fis);
-//                        m = (CarteDeTelefon) ois.readObject();
-//                        jTable1.setModel(m);
-//                        rowSorter = new TableRowSorter<>(jTable1.getModel());
-//                        jTable1.setRowSorter(rowSorter);
-//                        volatilePath = fisierSelectat;
-//                    }
-//                    ois.close();
-//                    }
-                }
+
+                model = model.loadFromFile(fisierSelectat);  //load(fisierSelectat);
+                jTable1.setModel(model);
+                sorter = new TableRowSorter<TableModel>(jTable1.getModel());
+                jTable1.setRowSorter(sorter);
             }
-        } catch (IOException e) {
-//            eroare("Incarcare fisier nereusita: " + e);
-//        } catch (HeadlessException | ClassNotFoundException e){
-//            eroare(e);
+        } catch (IOException | ClassNotFoundException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_JMenuOpenActionPerformed
 
     private void JMenuSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JMenuSaveActionPerformed
-        jFileChooser1.setAcceptAllFileFilterUsed(false);
-        jFileChooser1.setFileFilter(new FileNameExtensionFilter("*.agd", "agd"));
-        jFileChooser1.setFileSelectionMode(JFileChooser.FILES_ONLY);
-//        save(m);
+        if (jFileChooser1.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            try {
+                
+                File fisierSelectat = jFileChooser1.getSelectedFile();
+                String fileName = fisierSelectat.getPath();
+                if(!fileName.endsWith(".agd")){
+                    fileName+=".agd";
+                    fisierSelectat = new File(fileName);
+                }
+
+                model.saveToFile(fisierSelectat);
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }//GEN-LAST:event_JMenuSaveActionPerformed
 
-    private void jMenuAdaugaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuAdaugaActionPerformed
+    public void adauga() {
         jDialogAdauga.setLocationRelativeTo(null);
-        jDialogAdauga.setVisible(true);
+        jDialogAdauga.setVisible(true); 
+    }
+    
+    private void jMenuAdaugaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuAdaugaActionPerformed
+        adauga();
     }//GEN-LAST:event_jMenuAdaugaActionPerformed
 
     private void jButtonAdaugaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAdaugaActionPerformed
-        jDialogAdauga.setLocationRelativeTo(null);
-        jDialogAdauga.setVisible(true);
+        adauga();
     }//GEN-LAST:event_jButtonAdaugaActionPerformed
 
     private void jButtonInchideActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonInchideActionPerformed
@@ -990,6 +1037,7 @@ public class FereastraPrincipala extends javax.swing.JFrame {
 
     private void jDialogAdaugaWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_jDialogAdaugaWindowClosing
         resetAddFields();
+        //TODO - what if a validation error is triggered - we do not need to clear the data
     }//GEN-LAST:event_jDialogAdaugaWindowClosing
 
     private void jButtonNuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonNuActionPerformed
@@ -1007,15 +1055,17 @@ public class FereastraPrincipala extends javax.swing.JFrame {
             String prenume = jTextFirstName.getText();
             String cnp = jTextCnp.getText();
             String telefon = jTextPhone.getText();
-            //TipTelefon tipTelefon = TipTelefon.FIX;
             NrTel nrTel = new NrMobil(telefon);
+            TipTelefon tipTelefon = TipTelefon.valueOf(jComboBoxPhoneType1.getSelectedItem().toString());
 
-            Abonat abonat = new Abonat(nume, prenume, cnp, nrTel);
-
+            Abonat abonat = new Abonat(nume, prenume, cnp, nrTel, tipTelefon);
+            //TODO - this will throw IllegalArgumentException if one of the parameters are wrong 
+             
             model.adaugaAbonat(abonat);
+            
 
         } catch (IllegalArgumentException e) {
-            //eroare(e.getMessage());
+             JOptionPane.showMessageDialog(this, e.getMessage(), "Eroare", JOptionPane.ERROR_MESSAGE);
         }
 
     }//GEN-LAST:event_jButtonAdaugaAbonatActionPerformed
@@ -1033,33 +1083,32 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         jDialogSterge.dispose();
     }//GEN-LAST:event_jButtonStergeAbonatActionPerformed
 
-    private void jButtonStergeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonStergeActionPerformed
+    public void sterge() {
+               //TODO - add metoda de verificare index care deschide un dialog box
+        //ca sa nu mai repet codul si la celalalt buton de sus (meniu si buton sterge
         int selected = jTable1.getSelectedRow();
-        if (selected == -1 || jTable1.getColumnCount() == 0) {
-            //TODO - dialog box - nu ati selectat un abonat! instead fo this exception
-            //throw new IllegalStateException("bla bla");
-            JOptionPane.showMessageDialog(null, "Nu ati selectat un abonat!", "Eroare", JOptionPane.ERROR_MESSAGE);
-        } else {
-            jDialogSterge.setLocationRelativeTo(null);
-            jDialogSterge.setVisible(true);
+
+        if (jTable1.getRowCount() < 1) {
+            JOptionPane.showMessageDialog(this, "Lista nu contine abonati! Nu aveti ce sterge.", "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
         }
 
+        if (selected == -1 || jTable1.getColumnCount() == 0) {
+            JOptionPane.showMessageDialog(this, "Selectati un abonat din tabel", "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        jDialogSterge.setLocationRelativeTo(null);
+        jDialogSterge.setVisible(true); 
+    }
+    
+    
+    private void jButtonStergeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonStergeActionPerformed
+        sterge();
     }//GEN-LAST:event_jButtonStergeActionPerformed
 
     private void jMenuStergeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuStergeActionPerformed
-        //TODO - add metoda de verificare index care deschide un dialog box
-        //ca sa nu mai repet codul si la celalalt buton de sus (meniu si buton sterge
-        int selected = jTable1.getSelectedRow();
-        if (selected == -1 || jTable1.getColumnCount() == 0) {
-            //TODO - dialog box - nu ati selectat un abonat! instead fo this exception
-            //throw new IllegalStateException("bla bla");
-            //custom title, error icon
-            JOptionPane.showMessageDialog(null, "Nu ati selectat un abonat!", "Eroare", JOptionPane.ERROR_MESSAGE);
-        } else {
-            jDialogSterge.setLocationRelativeTo(null);
-            jDialogSterge.setVisible(true);
-        }
-
+        sterge();
     }//GEN-LAST:event_jMenuStergeActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -1067,13 +1116,22 @@ public class FereastraPrincipala extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButtonSorteazaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSorteazaActionPerformed
-        jDialogSortare.setLocationRelativeTo(null);
-        jDialogSortare.setVisible(true);
+        if (jTable1.getRowCount() < 1) {
+            JOptionPane.showMessageDialog(this, "Lista de abonati este goala. Nu aveti ce sorta!", "Info", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            jDialogSortare.setLocationRelativeTo(null);
+            jDialogSortare.setVisible(true);
+        }
     }//GEN-LAST:event_jButtonSorteazaActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        model.sortare(1, 'a');
-        jDialogSortare.setVisible(false);
+        int coloana = SortareDupa.valueOf(jComboBoxSortare.getSelectedItem().toString()).getIndex();
+        SortOrder directie = SortOrder.valueOf(jComboBoxDirectieSortare.getSelectedItem().toString());
+
+        List<RowSorter.SortKey> sortKeys = new ArrayList<>();
+        sortKeys.add(new RowSorter.SortKey(coloana, directie));
+        sorter.setSortKeys(sortKeys);
+        sorter.sort();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
@@ -1090,49 +1148,59 @@ public class FereastraPrincipala extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonInchide1ActionPerformed
 
     private void jButtonModificaAbonatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonModificaAbonatActionPerformed
-        // TODO add your handling code here:
+        try {
+            String nume = jTextLastName.getText();
+            String prenume = jTextFirstName.getText();
+            String cnp = jTextCnp.getText();
+            String telefon = jTextPhone.getText();
+            NrTel nrTel = new NrMobil(telefon);
+            TipTelefon tipTelefon = TipTelefon.valueOf(jComboBoxPhoneType1.getSelectedItem().toString());
+
+            Abonat abonat = new Abonat(nume, prenume, cnp, nrTel, tipTelefon);
+
+            model.modificaAbonat(abonat);
+
+        } catch (IllegalArgumentException e) {
+            //eroare(e.getMessage());
+        }
+
+
     }//GEN-LAST:event_jButtonModificaAbonatActionPerformed
 
-    private void jButtonModificaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonModificaActionPerformed
+    public void modifica() {
         int selected = jTable1.getSelectedRow();
+
+        if (jTable1.getRowCount() < 1) {
+            JOptionPane.showMessageDialog(this, "Lista nu contine abonati! Nu aveti ce modifica.", "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
         if (selected == -1 || jTable1.getColumnCount() == 0) {
             //TODO - dialog box - nu ati selectat un abonat! instead fo this exception
             //throw new IllegalStateException("bla bla");
-            JOptionPane.showMessageDialog(null, "Nu ati selectat un abonat!", "Eroare", JOptionPane.ERROR_MESSAGE);
-        } else {
-            jDialogModifica.setLocationRelativeTo(null);
-            jDialogModifica.setVisible(true);
-
-
-            //TODO - replace this stupid repeat
-            Abonat abonat = model.getElementAt(selected);
-            jTextLastName1.setText(abonat.getNume());
-            jTextFirstName1.setText(abonat.getPrenume());
-            jTextCnp1.setText(abonat.getCnp());
-            jTextPhone1.setText(abonat.getTelefon().toString());
-            //TODO add - phone type
+            JOptionPane.showMessageDialog(this, "Selectati un abonat din tabel", "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
         }
+
+        jDialogModifica.setLocationRelativeTo(null);
+        jDialogModifica.setVisible(true);
+
+        //TODO - replace this stupid repeat
+        Abonat abonat = model.getElementAt(selected);
+        jTextLastName1.setText(abonat.getNume());
+        jTextFirstName1.setText(abonat.getPrenume());
+        jTextCnp1.setText(abonat.getCnp());
+        jTextPhone1.setText(abonat.getTelefon().toString());
+        jComboBoxPhoneType1.setSelectedItem(abonat.getTipTelefon().name());
+        //TODO add - phone type 
+    }
+    
+    private void jButtonModificaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonModificaActionPerformed
+        modifica();
     }//GEN-LAST:event_jButtonModificaActionPerformed
 
     private void jMenuModificaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuModificaActionPerformed
-        int selected = jTable1.getSelectedRow();
-        if (selected == -1 || jTable1.getColumnCount() == 0) {
-            //TODO - dialog box - nu ati selectat un abonat! instead fo this exception
-            //throw new IllegalStateException("bla bla");
-            JOptionPane.showMessageDialog(null, "Nu ati selectat un abonat!", "Eroare", JOptionPane.ERROR_MESSAGE);
-        } else {
-            jDialogModifica.setLocationRelativeTo(null);
-            jDialogModifica.setVisible(true);
-
-            //TODO - replace this stupid repeat
-            Abonat abonat = model.getElementAt(selected);
-            jTextLastName1.setText(abonat.getNume());
-            jTextFirstName1.setText(abonat.getPrenume());
-            jTextCnp1.setText(abonat.getCnp());
-            jTextPhone1.setText(abonat.getTelefon().toString());
-            //TODO add - phone type
-
-        }
+        modifica();
     }//GEN-LAST:event_jMenuModificaActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
@@ -1206,9 +1274,10 @@ public class FereastraPrincipala extends javax.swing.JFrame {
     private javax.swing.JButton jButtonSorteaza;
     private javax.swing.JButton jButtonSterge;
     private javax.swing.JButton jButtonStergeAbonat;
-    private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JComboBox<String> jComboBoxDirectieSortare;
     private javax.swing.JComboBox<String> jComboBoxPhoneType;
     private javax.swing.JComboBox<String> jComboBoxPhoneType1;
+    private javax.swing.JComboBox<String> jComboBoxSortare;
     private javax.swing.JDialog jDialogAbout;
     private javax.swing.JDialog jDialogAdauga;
     private javax.swing.JDialog jDialogIesire;
@@ -1222,6 +1291,7 @@ public class FereastraPrincipala extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;

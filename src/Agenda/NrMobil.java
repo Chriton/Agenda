@@ -6,6 +6,8 @@
 package Agenda;
 
 
+import Agenda.Enums.TipTelefon;
+
 import java.io.Serializable;
 
 /**

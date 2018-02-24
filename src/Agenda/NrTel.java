@@ -5,6 +5,8 @@
  */
 package Agenda;
 
+import Agenda.Enums.TipTelefon;
+
 import java.io.Serializable;
 import java.util.Comparator;
 
@@ -49,7 +51,7 @@ public abstract class NrTel implements Serializable, Comparator {
     //public abstract boolean valideazaNumar(String numar);
     public void valideazaNumar(String numar) {
         if (!numar.matches(tipTelefon.getRegex())) {
-            throw new IllegalStateException(String.format("Numarul de telefon %s nu este valid", tipTelefon.name().toLowerCase()));
+            throw new IllegalArgumentException(String.format("Numarul de telefon %s nu este valid", tipTelefon.name().toLowerCase()));
         }
     }
 }

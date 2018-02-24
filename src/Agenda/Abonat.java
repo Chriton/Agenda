@@ -5,6 +5,9 @@
  */
 package Agenda;
 
+import Agenda.Enums.Apelativ;
+import Agenda.Enums.TipTelefon;
+
 import java.io.Serializable;
 import java.util.Comparator;
 
@@ -13,29 +16,33 @@ import java.util.Comparator;
  */
 public class Abonat implements Serializable /*, Comparator */ {
 
-    private NrTel telefon;
     private String nume;
     private String prenume;
     private String cnp;
+    private NrTel telefon;
+    private TipTelefon tipTelefon;
 
     //org.apache.commons.lang.StringUtils
     //StringUtils.capitalize(Str);
     //test
 
-    public Abonat(String nume, String prenume, String cnp, NrTel telefon) {
+    public Abonat(String nume, String prenume, String cnp, NrTel telefon, TipTelefon tipTelefon) {
 
         valideazaNumeSauPrenume(nume, Apelativ.NUME);
         valideazaNumeSauPrenume(prenume, Apelativ.PRENUME);
 
+        //TODO throw IllegalArgumentException if one of the parameters are wrong  
+        
         this.nume = nume;
         this.prenume = prenume;
         this.cnp = cnp;
         this.telefon = telefon;
+        this.tipTelefon = tipTelefon;
     }
 
     @Override
     public String toString() {
-        return String.format("Nume: %s Prenume: %s CNP: %s Telefon: %s", nume, prenume, cnp, telefon);
+        return String.format("Nume: %s Prenume: %s CNP: %s Telefon %s: %s", nume, prenume, cnp, tipTelefon, telefon);
     }
 
     public NrTel getTelefon() {
@@ -44,6 +51,14 @@ public class Abonat implements Serializable /*, Comparator */ {
 
     public void setTelefon(NrTel telefon) {
         this.telefon = telefon;
+    }
+
+    public TipTelefon getTipTelefon() {
+        return tipTelefon;
+    }
+
+    public void setTipTelefon(TipTelefon tipTelefon) {
+        this.tipTelefon = tipTelefon;
     }
 
     public String getNume() {
@@ -79,7 +94,7 @@ public class Abonat implements Serializable /*, Comparator */ {
             throw new IllegalArgumentException(String.format("Campul %s trebuie sa contina maxim 30 litere", apelativ.name().toLowerCase()));
         }
 
-        if (numeSauPrenume.matches("([0-9])")) {
+        if (numeSauPrenume.matches(".*\\d+.*")) { //TODO - nu merge
             throw new IllegalArgumentException(String.format("Campul %s trebuie sa contina doar litere", apelativ.name().toLowerCase()));
         }
     }
@@ -129,6 +144,16 @@ public class Abonat implements Serializable /*, Comparator */ {
             @Override
             public int compare(Abonat a1, Abonat a2) {
                 return a1.getTelefon().toString().compareToIgnoreCase(a2.getTelefon().toString());
+            }
+        };
+    }
+
+    public static Comparator<Abonat> dupaTipTelefon() {
+
+        return new Comparator<Abonat>() {
+            @Override
+            public int compare(Abonat a1, Abonat a2) {
+                return a1.getTipTelefon().name().compareToIgnoreCase(a2.getTipTelefon().name());
             }
         };
     }

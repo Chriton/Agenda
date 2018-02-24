@@ -6,7 +6,9 @@
 package Agenda;
 
 
-        import java.io.Serializable;
+import Agenda.Enums.TipTelefon;
+
+import java.io.Serializable;
 
 /**
  * @author dorumuntean

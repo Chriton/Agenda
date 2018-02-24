@@ -11,13 +11,14 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import javax.swing.JOptionPane;
 
 /**
  * @author dorumuntean
  */
 public class Poze {
 
-    private static final String LOCATIE_POZE = "";
+    private static final String LOCATIE_POZE = "/Reclame/Poze/";
 
     File directorPoze = new File(LOCATIE_POZE);
     //File[] poze;
@@ -30,6 +31,10 @@ public class Poze {
     public void incarcaColectiePoze() {
         if (!directorPoze.exists() || !directorPoze.isDirectory() || !directorPoze.canRead() || !directorPoze.canExecute()) {
             //creaza o lista cu numere in loc de poze;
+
+            //JOptionPane.showMessageDialog(null, "O erorare!", "EROARE", JOptionPane.ERROR_MESSAGE);
+            //return;
+
         } else {
             FileFilter filtruPNG = new FileFilter() {
                 @Override
@@ -38,6 +43,13 @@ public class Poze {
                 }
             };
             File[] fisiere = directorPoze.listFiles(filtruPNG);
+
+            if (fisiere.length == 0) {
+                // JOptionPane.showMessageDialog(null, "Directorul ales nu contine poze JPG!", "EROARE", JOptionPane.ERROR_MESSAGE);
+                //return;
+            }
+
+
             colectiePoze = Arrays.asList(fisiere);
         }
     }
