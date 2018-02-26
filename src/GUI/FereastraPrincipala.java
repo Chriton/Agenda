@@ -12,45 +12,61 @@ import Agenda.NrFix;
 import Agenda.NrMobil;
 import Agenda.NrTel;
 import Agenda.Enums.SortareDupa;
-import Reclame.TaskReclame;
+
 import Agenda.Enums.TipTelefon;
 import Reclame.TimerReclame;
+import Utils.Register;
+
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+
 import java.util.ArrayList;
-import java.util.Arrays;
+
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.stream.Stream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JWindow;
 import javax.swing.ListSelectionModel;
+import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
+import javax.swing.SwingConstants;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.DefaultTableModel;
+
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 
 /**
  * @author dorumuntean
+ * daca vrem sa folosim clasa SplashScreen -> Issue with Netbeans not showing the popup:
+ * In netbeans -> Open Project Properties -> Run -> VM and set the location of the image file like: -splash:src/splash/splash.png
+ * https://stackoverflow.com/questions/23273267/changing-splashscreen-image-with-splashscreen-setimageurllink
+ * http://wiki.netbeans.org/Splash_Screen_Beginner_Tutorial
  */
 public class FereastraPrincipala extends javax.swing.JFrame {
 
 
     private CarteDeTelefon model = new CarteDeTelefon();
-    TimerReclame reclame;
-    TableRowSorter<TableModel> sorter;
-
+    private TimerReclame reclame;
+    private Abonat abonatDeModificat;
+    private TableRowSorter<TableModel> sorter;
+    
 
     /**
      * Creates new form FereastraPrincipala
@@ -59,8 +75,13 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         initComponents();
 
         //TODO check if the user is registered, if not start the commercials
-        reclame = new TimerReclame(jLabelReclame);
-        reclame.pornesteReclame();
+        if (!Register.isRegistered()) {
+            reclame = new TimerReclame(jLabelReclame);
+            reclame.porneste();
+            isRegistered(false);
+        } else {
+            isRegistered(true);
+        }
 
         //TODO incarcare date automat din fisier default
 
@@ -73,7 +94,6 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         jComboBoxPhoneType1.setModel(tipuriTelefon);
         jComboBoxPhoneType.setModel(tipuriTelefon);
 
-
         //Combo box - sortare dupa
         DefaultComboBoxModel modelSortare = new DefaultComboBoxModel(SortareDupa.lista());
         jComboBoxSortare.setModel(modelSortare);
@@ -82,17 +102,73 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         DefaultComboBoxModel modelDirectieSortare = new DefaultComboBoxModel(Directie.lista());
         jComboBoxDirectieSortare.setModel(modelDirectieSortare);
 
-        //Pentru sortare prin click pe cap tabel
-        sorter = new TableRowSorter<TableModel>(jTable1.getModel());
-        jTable1.setRowSorter(sorter);
-
+        //popup menu tabel
+        jMenuItemSterge.setText("Sterge");
+        jMenuItemModifica.setText("Modifica");
+        jPopupMenu.add(jMenuItemSterge);
+        jPopupMenu.add(jMenuItemModifica);
+        jTable1.setComponentPopupMenu(jPopupMenu);
+        
         //Filtru pentru FileChooser
         jFileChooser1.setFileFilter(new FileNameExtensionFilter("*.agd", "agd"));
         
         //TODO - 5min save
         fiveMinSave();
+        
+        //Pentru sortare prin click pe cap tabel si cautare
+        sorter = new TableRowSorter<>(jTable1.getModel());
+        jTable1.setRowSorter(sorter);
+        
+            
+        //event listener pentru functia de cautare
+        jTextFieldCauta.getDocument().addDocumentListener(new DocumentListener() {
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+          //warn();
+        }
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+          warn();
+        }
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+            warn();
+        }
+
+        public void warn() {
+           //jTable1.clearSelection();
+
+           String text = jTextFieldCauta.getText();
+            if (text.trim().length() == 0) {
+              sorter.setRowFilter(null);
+            } else {
+              sorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
+            }
+        }
+    });
+
     }
 
+    public void isRegistered(boolean isRegistered) {
+        if (isRegistered) {
+            JMenuOpen.setEnabled(true);
+            JMenuSave.setEnabled(true);
+            jMenuInregistrare.setEnabled(false);
+            jMenuInregistrare.setVisible(false);
+            jSeparator1.setVisible(false);
+            jLabelReclame.setEnabled(false);
+            jLabelReclame.setVisible(false); 
+        } else {
+            JMenuOpen.setEnabled(false);
+            JMenuSave.setEnabled(false);
+            jMenuInregistrare.setEnabled(true);
+            jMenuInregistrare.setVisible(true);
+            jSeparator1.setVisible(true);
+            jLabelReclame.setEnabled(true);
+            jLabelReclame.setVisible(true);
+        }
+    }
+    
     /**
      * Salveaza agenda la fiecare 5 min
      */
@@ -169,7 +245,7 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         jDialogSterge = new javax.swing.JDialog();
         jButtonNuSterge = new javax.swing.JButton();
         jButtonStergeAbonat = new javax.swing.JButton();
-        jLabel5 = new javax.swing.JLabel();
+        jLabelSterge = new javax.swing.JLabel();
         jFrameSplashScreen = new javax.swing.JFrame();
         jLabel6 = new javax.swing.JLabel();
         jProgressBar1 = new javax.swing.JProgressBar();
@@ -182,9 +258,9 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         jLabel13 = new javax.swing.JLabel();
         jDialogInregistrare = new javax.swing.JDialog();
         jLabel8 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
+        jTextFieldRegisterCode = new javax.swing.JTextField();
+        jButtonInregistreaza = new javax.swing.JButton();
+        jButtonInapoi = new javax.swing.JButton();
         jDialogModifica = new javax.swing.JDialog();
         jPanelForm1 = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
@@ -199,6 +275,9 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         jPanelButoane1 = new javax.swing.JPanel();
         jButtonInchide1 = new javax.swing.JButton();
         jButtonModificaAbonat = new javax.swing.JButton();
+        jPopupMenu = new javax.swing.JPopupMenu();
+        jMenuItemSterge = new javax.swing.JMenuItem();
+        jMenuItemModifica = new javax.swing.JMenuItem();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jButtonAdauga = new javax.swing.JButton();
@@ -208,8 +287,9 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         jButtonIesire = new javax.swing.JButton();
         jLabelReclame = new javax.swing.JLabel();
         jLabelCauta = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        jTextFieldCauta = new javax.swing.JTextField();
         jLabelSalvare = new javax.swing.JLabel();
+        jButton5 = new javax.swing.JButton();
         MeniuPrincipal = new javax.swing.JMenuBar();
         MeniuFile = new javax.swing.JMenu();
         JMenuOpen = new javax.swing.JMenuItem();
@@ -220,7 +300,7 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         jMenuAdauga = new javax.swing.JMenuItem();
         jMenuSterge = new javax.swing.JMenuItem();
         jMenuModifica = new javax.swing.JMenuItem();
-        jMenuCauta = new javax.swing.JMenuItem();
+        jMenuItem1 = new javax.swing.JMenuItem();
         MeniuHelp = new javax.swing.JMenu();
         jMenuInregistrare = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
@@ -304,18 +384,18 @@ public class FereastraPrincipala extends javax.swing.JFrame {
             .addGap(0, 116, Short.MAX_VALUE)
             .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel3Layout.createSequentialGroup()
-                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addGap(0, 20, Short.MAX_VALUE)
                     .addComponent(jButtonOk)
-                    .addGap(0, 0, Short.MAX_VALUE)))
+                    .addGap(0, 21, Short.MAX_VALUE)))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 100, Short.MAX_VALUE)
             .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel3Layout.createSequentialGroup()
-                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addGap(0, 35, Short.MAX_VALUE)
                     .addComponent(jButtonOk)
-                    .addGap(0, 0, Short.MAX_VALUE)))
+                    .addGap(0, 36, Short.MAX_VALUE)))
         );
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -400,6 +480,7 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         jPanelForm.add(jLabel4, gridBagConstraints);
 
         jTextPhone.setToolTipText("");
+        jTextPhone.setActionCommand("<Not Set>");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
@@ -461,7 +542,8 @@ public class FereastraPrincipala extends javax.swing.JFrame {
             }
         });
 
-        jLabel5.setText("Sunteti sigur ca doriti sa stergeti abonatul?");
+        jLabelSterge.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabelSterge.setText("Sunteti sigur ca doriti sa stergeti abonatul?");
 
         javax.swing.GroupLayout jDialogStergeLayout = new javax.swing.GroupLayout(jDialogSterge.getContentPane());
         jDialogSterge.getContentPane().setLayout(jDialogStergeLayout);
@@ -469,19 +551,21 @@ public class FereastraPrincipala extends javax.swing.JFrame {
             jDialogStergeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jDialogStergeLayout.createSequentialGroup()
                 .addGap(53, 53, 53)
-                .addGroup(jDialogStergeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 276, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jDialogStergeLayout.createSequentialGroup()
-                        .addComponent(jButtonNuSterge, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(110, 110, 110)
-                        .addComponent(jButtonStergeAbonat, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addComponent(jButtonNuSterge, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(110, 110, 110)
+                .addComponent(jButtonStergeAbonat, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(jDialogStergeLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabelSterge, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         jDialogStergeLayout.setVerticalGroup(
             jDialogStergeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jDialogStergeLayout.createSequentialGroup()
-                .addGap(45, 45, 45)
-                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(6, 6, 6)
+                .addContainerGap()
+                .addComponent(jLabelSterge, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jDialogStergeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jButtonNuSterge)
                     .addComponent(jButtonStergeAbonat)))
@@ -590,17 +674,17 @@ public class FereastraPrincipala extends javax.swing.JFrame {
 
         jLabel8.setText("Introduceti codul de inregistrare: ");
 
-        jButton3.setText("Inregistreaza");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        jButtonInregistreaza.setText("Inregistreaza");
+        jButtonInregistreaza.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                jButtonInregistreazaActionPerformed(evt);
             }
         });
 
-        jButton4.setText("Inapoi");
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
+        jButtonInapoi.setText("Inapoi");
+        jButtonInapoi.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
+                jButtonInapoiActionPerformed(evt);
             }
         });
 
@@ -612,12 +696,12 @@ public class FereastraPrincipala extends javax.swing.JFrame {
                 .addGap(43, 43, 43)
                 .addGroup(jDialogInregistrareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jDialogInregistrareLayout.createSequentialGroup()
-                        .addComponent(jButton4)
+                        .addComponent(jButtonInapoi)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 43, Short.MAX_VALUE)
-                        .addComponent(jButton3))
+                        .addComponent(jButtonInregistreaza))
                     .addGroup(jDialogInregistrareLayout.createSequentialGroup()
                         .addGroup(jDialogInregistrareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTextFieldRegisterCode, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel8))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
@@ -628,11 +712,11 @@ public class FereastraPrincipala extends javax.swing.JFrame {
                 .addGap(26, 26, 26)
                 .addComponent(jLabel8)
                 .addGap(18, 18, 18)
-                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jTextFieldRegisterCode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(23, 23, 23)
                 .addGroup(jDialogInregistrareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton3)
-                    .addComponent(jButton4))
+                    .addComponent(jButtonInregistreaza)
+                    .addComponent(jButtonInapoi))
                 .addContainerGap(62, Short.MAX_VALUE))
         );
 
@@ -745,6 +829,22 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         jDialogModifica.getContentPane().add(jPanelButoane1, gridBagConstraints);
 
+        jMenuItemSterge.setText("jMenuItem1");
+        jMenuItemSterge.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemStergeActionPerformed(evt);
+            }
+        });
+        jPopupMenu.add(jMenuItemSterge);
+
+        jMenuItemModifica.setText("jMenuItem2");
+        jMenuItemModifica.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemModificaActionPerformed(evt);
+            }
+        });
+        jPopupMenu.add(jMenuItemModifica);
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
 
@@ -786,21 +886,27 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         });
 
         jLabelReclame.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabelReclame.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Reclame/Poze/reclama1.png"))); // NOI18N
 
-        jLabelCauta.setText("Cauta");
+        jLabelCauta.setText("Puteti cauta abonati dupa nume, prenume, cnp, telefon sau tip telefon.");
 
-        jTextField1.setToolTipText("Cauta");
+        jTextFieldCauta.setToolTipText("Cauta");
+
+        jButton5.setText("X");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
 
         MeniuPrincipal.setName(""); // NOI18N
 
         MeniuFile.setMnemonic('F');
         MeniuFile.setText("File");
 
-        JMenuOpen.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, 0));
         JMenuOpen.setMnemonic('O');
         JMenuOpen.setText("Open");
         JMenuOpen.setToolTipText("");
+        JMenuOpen.setEnabled(false);
         JMenuOpen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 JMenuOpenActionPerformed(evt);
@@ -808,9 +914,9 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         });
         MeniuFile.add(JMenuOpen);
 
-        JMenuSave.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, 0));
         JMenuSave.setMnemonic('S');
         JMenuSave.setText("Save");
+        JMenuSave.setEnabled(false);
         JMenuSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 JMenuSaveActionPerformed(evt);
@@ -819,7 +925,6 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         MeniuFile.add(JMenuSave);
         MeniuFile.add(Separator);
 
-        JMenuIesire.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, 0));
         JMenuIesire.setMnemonic('I');
         JMenuIesire.setText("Iesire");
         JMenuIesire.addActionListener(new java.awt.event.ActionListener() {
@@ -834,7 +939,6 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         MeniuAbonati.setMnemonic('A');
         MeniuAbonati.setText("Abonati");
 
-        jMenuAdauga.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, 0));
         jMenuAdauga.setMnemonic('A');
         jMenuAdauga.setText("Adauga...");
         jMenuAdauga.addActionListener(new java.awt.event.ActionListener() {
@@ -844,7 +948,6 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         });
         MeniuAbonati.add(jMenuAdauga);
 
-        jMenuSterge.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, 0));
         jMenuSterge.setMnemonic('S');
         jMenuSterge.setText("Sterge...");
         jMenuSterge.addActionListener(new java.awt.event.ActionListener() {
@@ -854,7 +957,6 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         });
         MeniuAbonati.add(jMenuSterge);
 
-        jMenuModifica.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M, 0));
         jMenuModifica.setMnemonic('M');
         jMenuModifica.setText("Modifica...");
         jMenuModifica.addActionListener(new java.awt.event.ActionListener() {
@@ -864,17 +966,20 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         });
         MeniuAbonati.add(jMenuModifica);
 
-        jMenuCauta.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, 0));
-        jMenuCauta.setMnemonic('C');
-        jMenuCauta.setText("Cauta...");
-        MeniuAbonati.add(jMenuCauta);
+        jMenuItem1.setMnemonic('o');
+        jMenuItem1.setText("Sorteaza");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        MeniuAbonati.add(jMenuItem1);
 
         MeniuPrincipal.add(MeniuAbonati);
 
         MeniuHelp.setMnemonic('H');
         MeniuHelp.setText("Help");
 
-        jMenuInregistrare.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_I, 0));
         jMenuInregistrare.setMnemonic('I');
         jMenuInregistrare.setText("Inregistrare");
         jMenuInregistrare.addActionListener(new java.awt.event.ActionListener() {
@@ -885,7 +990,6 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         MeniuHelp.add(jMenuInregistrare);
         MeniuHelp.add(jSeparator1);
 
-        jMenuAbout.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, 0));
         jMenuAbout.setMnemonic('A');
         jMenuAbout.setText("About");
         jMenuAbout.addActionListener(new java.awt.event.ActionListener() {
@@ -906,6 +1010,9 @@ public class FereastraPrincipala extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabelReclame, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -918,15 +1025,17 @@ public class FereastraPrincipala extends javax.swing.JFrame {
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(jLabelSalvare, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabelReclame, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(224, 224, 224)
-                        .addComponent(jLabelCauta)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField1)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 685, Short.MAX_VALUE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(8, 8, 8)
+                                        .addComponent(jLabelCauta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(jTextFieldCauta))
+                                .addGap(1, 1, 1)
+                                .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(49, 49, 49)))))
                 .addContainerGap())
         );
 
@@ -936,26 +1045,27 @@ public class FereastraPrincipala extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButtonAdauga)
+                    .addComponent(jLabelCauta, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButtonSterge)
+                    .addComponent(jTextFieldCauta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton5))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButtonAdauga)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButtonSterge)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButtonModifica)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButtonSorteaza)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(113, 113, 113)
                         .addComponent(jLabelSalvare, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jButtonIesire))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabelCauta))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 298, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabelReclame, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabelReclame, javax.swing.GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -985,13 +1095,14 @@ public class FereastraPrincipala extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuAboutActionPerformed
 
     private void JMenuOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JMenuOpenActionPerformed
+        //TODO atentie ca se poate deschide fereastra doar apasand pe O - fix it
         try {
             if (jFileChooser1.showOpenDialog(this) == jFileChooser1.APPROVE_OPTION) {
                 File fisierSelectat = jFileChooser1.getSelectedFile();
 
                 model = model.loadFromFile(fisierSelectat);  //load(fisierSelectat);
                 jTable1.setModel(model);
-                sorter = new TableRowSorter<TableModel>(jTable1.getModel());
+                sorter = new TableRowSorter<>(jTable1.getModel());
                 jTable1.setRowSorter(sorter);
             }
         } catch (IOException | ClassNotFoundException e) {
@@ -1017,9 +1128,73 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_JMenuSaveActionPerformed
 
+    public void verificaTabel() {
+        int selected = jTable1.getSelectedRow();
+
+        if (jTable1.getRowCount() < 1) {
+            throw new IllegalStateException("Lista nu contine abonati!");
+        }
+
+        if (selected == -1 || jTable1.getColumnCount() == 0) {
+            throw new IllegalStateException("Selectati un abonat din tabel!");
+        }
+    }
+    
     public void adauga() {
+        resetAddFields();
         jDialogAdauga.setLocationRelativeTo(null);
         jDialogAdauga.setVisible(true); 
+    }
+    
+    public void sterge() {
+        try {
+            verificaTabel();
+
+            String cnp = jTable1.getValueAt(jTable1.getSelectedRow(), 2).toString();
+            abonatDeModificat = model.getAbonatByCnp(cnp);            
+            
+            String nume = abonatDeModificat.getNume();
+            String prenume = abonatDeModificat.getPrenume();
+            
+            String confirmare = String.format("Sunteti sigur ca doriti sa stergeti abonatul %s %s?", nume, prenume);
+            jLabelSterge.setText(confirmare);
+            jDialogSterge.setLocationRelativeTo(null);
+            jDialogSterge.setVisible(true);
+        } catch (IllegalStateException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Info", JOptionPane.INFORMATION_MESSAGE);
+        }
+
+    }
+        
+    public void modifica() {
+         try {
+            verificaTabel();
+            
+            String cnp = jTable1.getValueAt(jTable1.getSelectedRow(), 2).toString();
+            abonatDeModificat = model.getAbonatByCnp(cnp); 
+            
+            
+            //abonatDeModificat = model.getElementAt(jTable1.getSelectedRow());
+            jTextLastName1.setText(abonatDeModificat.getNume());
+            jTextFirstName1.setText(abonatDeModificat.getPrenume());
+            jTextCnp1.setText(abonatDeModificat.getCnp());
+            jTextPhone1.setText(abonatDeModificat.getTelefon().toString());
+            jComboBoxPhoneType1.setSelectedItem(abonatDeModificat.getTipTelefon().name());
+        
+            jDialogModifica.setLocationRelativeTo(null);
+            jDialogModifica.setVisible(true);
+        } catch (IllegalStateException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Info", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+    
+    public void sorteaza() {
+        if (jTable1.getRowCount() < 1) {
+            JOptionPane.showMessageDialog(this, "Lista de abonati este goala. Nu aveti ce sorta!", "Info", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            jDialogSortare.setLocationRelativeTo(null);
+            jDialogSortare.setVisible(true);
+        }
     }
     
     private void jMenuAdaugaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuAdaugaActionPerformed
@@ -1031,13 +1206,11 @@ public class FereastraPrincipala extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonAdaugaActionPerformed
 
     private void jButtonInchideActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonInchideActionPerformed
-        resetAddFields();
         jDialogAdauga.dispose();
     }//GEN-LAST:event_jButtonInchideActionPerformed
 
     private void jDialogAdaugaWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_jDialogAdaugaWindowClosing
         resetAddFields();
-        //TODO - what if a validation error is triggered - we do not need to clear the data
     }//GEN-LAST:event_jDialogAdaugaWindowClosing
 
     private void jButtonNuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonNuActionPerformed
@@ -1055,19 +1228,18 @@ public class FereastraPrincipala extends javax.swing.JFrame {
             String prenume = jTextFirstName.getText();
             String cnp = jTextCnp.getText();
             String telefon = jTextPhone.getText();
-            NrTel nrTel = new NrMobil(telefon);
-            TipTelefon tipTelefon = TipTelefon.valueOf(jComboBoxPhoneType1.getSelectedItem().toString());
-
+            TipTelefon tipTelefon = TipTelefon.valueOf(jComboBoxPhoneType.getSelectedItem().toString());
+            NrTel nrTel = (tipTelefon == TipTelefon.MOBIL) ? new NrMobil(telefon) : new NrFix(telefon);
+                  
+            //arunca IllegalArgumentException daca parametri nu sunt ok sau daca cnp-ul exista deja in lista  
             Abonat abonat = new Abonat(nume, prenume, cnp, nrTel, tipTelefon);
-            //TODO - this will throw IllegalArgumentException if one of the parameters are wrong 
-             
             model.adaugaAbonat(abonat);
             
-
+            jDialogAdauga.dispose();
+  
         } catch (IllegalArgumentException e) {
              JOptionPane.showMessageDialog(this, e.getMessage(), "Eroare", JOptionPane.ERROR_MESSAGE);
         }
-
     }//GEN-LAST:event_jButtonAdaugaAbonatActionPerformed
 
     private void jButtonNuStergeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonNuStergeActionPerformed
@@ -1075,33 +1247,12 @@ public class FereastraPrincipala extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonNuStergeActionPerformed
 
     private void jButtonStergeAbonatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonStergeAbonatActionPerformed
-
-        //TODO - verificare daca e selectat abonat - vezi creare metoda mai jos la jMenuStergeActionPerformed
-        int selected = jTable1.getSelectedRow();
-
-        model.stergeAbonat(model.getElementAt(selected));
+        //model.stergeAbonat(model.getElementAt(jTable1.getSelectedRow()));
+        
+        model.stergeAbonat(abonatDeModificat);
+        
         jDialogSterge.dispose();
     }//GEN-LAST:event_jButtonStergeAbonatActionPerformed
-
-    public void sterge() {
-               //TODO - add metoda de verificare index care deschide un dialog box
-        //ca sa nu mai repet codul si la celalalt buton de sus (meniu si buton sterge
-        int selected = jTable1.getSelectedRow();
-
-        if (jTable1.getRowCount() < 1) {
-            JOptionPane.showMessageDialog(this, "Lista nu contine abonati! Nu aveti ce sterge.", "Info", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-
-        if (selected == -1 || jTable1.getColumnCount() == 0) {
-            JOptionPane.showMessageDialog(this, "Selectati un abonat din tabel", "Info", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-
-        jDialogSterge.setLocationRelativeTo(null);
-        jDialogSterge.setVisible(true); 
-    }
-    
     
     private void jButtonStergeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonStergeActionPerformed
         sterge();
@@ -1116,12 +1267,7 @@ public class FereastraPrincipala extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButtonSorteazaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSorteazaActionPerformed
-        if (jTable1.getRowCount() < 1) {
-            JOptionPane.showMessageDialog(this, "Lista de abonati este goala. Nu aveti ce sorta!", "Info", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            jDialogSortare.setLocationRelativeTo(null);
-            jDialogSortare.setVisible(true);
-        }
+        sorteaza();
     }//GEN-LAST:event_jButtonSorteazaActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -1132,11 +1278,13 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         sortKeys.add(new RowSorter.SortKey(coloana, directie));
         sorter.setSortKeys(sortKeys);
         sorter.sort();
+        
+        jDialogSortare.setVisible(false);
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+    private void jButtonInapoiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonInapoiActionPerformed
         jDialogInregistrare.dispose();
-    }//GEN-LAST:event_jButton4ActionPerformed
+    }//GEN-LAST:event_jButtonInapoiActionPerformed
 
     private void jMenuInregistrareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuInregistrareActionPerformed
         jDialogInregistrare.setLocationRelativeTo(null);
@@ -1149,51 +1297,32 @@ public class FereastraPrincipala extends javax.swing.JFrame {
 
     private void jButtonModificaAbonatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonModificaAbonatActionPerformed
         try {
-            String nume = jTextLastName.getText();
-            String prenume = jTextFirstName.getText();
-            String cnp = jTextCnp.getText();
-            String telefon = jTextPhone.getText();
-            NrTel nrTel = new NrMobil(telefon);
+                
+            String nume = jTextLastName1.getText();
+            String prenume = jTextFirstName1.getText();
+            String cnp = jTextCnp1.getText();
+            String telefon = jTextPhone1.getText();
             TipTelefon tipTelefon = TipTelefon.valueOf(jComboBoxPhoneType1.getSelectedItem().toString());
+            NrTel nrTel = (tipTelefon == TipTelefon.MOBIL) ? new NrMobil(telefon) : new NrFix(telefon);
 
-            Abonat abonat = new Abonat(nume, prenume, cnp, nrTel, tipTelefon);
+            //facem o copie si verificam ca noul cnp sa nu fie prezent
+            CarteDeTelefon copie = model.dublura();
+            copie.stergeAbonat(abonatDeModificat);
+            if (copie.isAbonatPresent(cnp)) {
+                throw new IllegalArgumentException("Exista deja un abonat cu acest cnp!");
+            }
 
-            model.modificaAbonat(abonat);
+            Abonat abonatDateNoi = new Abonat(nume, prenume, cnp, nrTel, tipTelefon);
+            model.modificaAbonat(abonatDeModificat.getCnp(), abonatDateNoi);
+            
+            jDialogModifica.dispose();
 
         } catch (IllegalArgumentException e) {
-            //eroare(e.getMessage());
+             JOptionPane.showMessageDialog(this, e.getMessage(), "Eroare", JOptionPane.ERROR_MESSAGE);
         }
 
 
     }//GEN-LAST:event_jButtonModificaAbonatActionPerformed
-
-    public void modifica() {
-        int selected = jTable1.getSelectedRow();
-
-        if (jTable1.getRowCount() < 1) {
-            JOptionPane.showMessageDialog(this, "Lista nu contine abonati! Nu aveti ce modifica.", "Info", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-
-        if (selected == -1 || jTable1.getColumnCount() == 0) {
-            //TODO - dialog box - nu ati selectat un abonat! instead fo this exception
-            //throw new IllegalStateException("bla bla");
-            JOptionPane.showMessageDialog(this, "Selectati un abonat din tabel", "Info", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-
-        jDialogModifica.setLocationRelativeTo(null);
-        jDialogModifica.setVisible(true);
-
-        //TODO - replace this stupid repeat
-        Abonat abonat = model.getElementAt(selected);
-        jTextLastName1.setText(abonat.getNume());
-        jTextFirstName1.setText(abonat.getPrenume());
-        jTextCnp1.setText(abonat.getCnp());
-        jTextPhone1.setText(abonat.getTelefon().toString());
-        jComboBoxPhoneType1.setSelectedItem(abonat.getTipTelefon().name());
-        //TODO add - phone type 
-    }
     
     private void jButtonModificaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonModificaActionPerformed
         modifica();
@@ -1203,15 +1332,48 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         modifica();
     }//GEN-LAST:event_jMenuModificaActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        //TODO check if the code is correct then stop the commercials
-        reclame.opresteReclame();
-    }//GEN-LAST:event_jButton3ActionPerformed
+    private void jButtonInregistreazaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonInregistreazaActionPerformed
+        //Check if the code is correct then stop the commercials
+        String registerCode = jTextFieldRegisterCode.getText();
+        
+        if (!registerCode.equals(Register.getRegistrationCode())) {
+            JOptionPane.showMessageDialog(this, "Codul de inregistrare nu este corect!", "Eroare", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        try {
+            Register.register();
+            if (Register.isRegistered()) {
+                reclame.opreste();
+                isRegistered(true);
+                jDialogInregistrare.dispose(); 
+            }  
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Eroare", JOptionPane.ERROR_MESSAGE);
+        }          
+    }//GEN-LAST:event_jButtonInregistreazaActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        jTextFieldCauta.setText("");
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jMenuItemStergeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemStergeActionPerformed
+        sterge();
+    }//GEN-LAST:event_jMenuItemStergeActionPerformed
+
+    private void jMenuItemModificaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemModificaActionPerformed
+        modifica();
+    }//GEN-LAST:event_jMenuItemModificaActionPerformed
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        sorteaza();
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
+              
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -1235,17 +1397,19 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         }
         //</editor-fold>
     
-        
-          
-        
+        //Splash screen
+        Splash mySplash = new Splash();
+        mySplash.showSplash();
         
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new FereastraPrincipala().setVisible(true);
+                new FereastraPrincipala().setVisible(true);  
             }
         });
     }
+    
+ 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem JMenuIesire;
@@ -1258,14 +1422,15 @@ public class FereastraPrincipala extends javax.swing.JFrame {
     private javax.swing.JPopupMenu.Separator Separator;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
     private javax.swing.JButton jButtonAdauga;
     private javax.swing.JButton jButtonAdaugaAbonat;
     private javax.swing.JButton jButtonDa;
     private javax.swing.JButton jButtonIesire;
+    private javax.swing.JButton jButtonInapoi;
     private javax.swing.JButton jButtonInchide;
     private javax.swing.JButton jButtonInchide1;
+    private javax.swing.JButton jButtonInregistreaza;
     private javax.swing.JButton jButtonModifica;
     private javax.swing.JButton jButtonModificaAbonat;
     private javax.swing.JButton jButtonNu;
@@ -1295,7 +1460,6 @@ public class FereastraPrincipala extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
@@ -1306,10 +1470,13 @@ public class FereastraPrincipala extends javax.swing.JFrame {
     private javax.swing.JLabel jLabelNume;
     private javax.swing.JLabel jLabelReclame;
     private javax.swing.JLabel jLabelSalvare;
+    private javax.swing.JLabel jLabelSterge;
     private javax.swing.JMenuItem jMenuAbout;
     private javax.swing.JMenuItem jMenuAdauga;
-    private javax.swing.JMenuItem jMenuCauta;
     private javax.swing.JMenuItem jMenuInregistrare;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItemModifica;
+    private javax.swing.JMenuItem jMenuItemSterge;
     private javax.swing.JMenuItem jMenuModifica;
     private javax.swing.JMenuItem jMenuSterge;
     private javax.swing.JPanel jPanel1;
@@ -1320,14 +1487,15 @@ public class FereastraPrincipala extends javax.swing.JFrame {
     private javax.swing.JPanel jPanelButoane1;
     private javax.swing.JPanel jPanelForm;
     private javax.swing.JPanel jPanelForm1;
+    private javax.swing.JPopupMenu jPopupMenu;
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JTable jTable1;
     private javax.swing.JTextField jTextCnp;
     private javax.swing.JTextField jTextCnp1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
+    private javax.swing.JTextField jTextFieldCauta;
+    private javax.swing.JTextField jTextFieldRegisterCode;
     private javax.swing.JTextField jTextFirstName;
     private javax.swing.JTextField jTextFirstName1;
     private javax.swing.JTextField jTextLastName;

@@ -5,9 +5,11 @@
  */
 package Reclame;
 
-import java.io.File;
+//import java.io.File;
+
 import java.util.List;
 import java.util.TimerTask;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 /**
@@ -16,26 +18,22 @@ import javax.swing.JLabel;
 public class TaskReclame extends TimerTask {
 
     private JLabel label;
-    private int temporar = 1;
-    //private Poze poze;
-    private List<File> colectiePoze;
+    private int index = 0;
+    private List<ImageIcon> colectiePoze;
 
     public TaskReclame(JLabel label) {
         this.label = label;
+        //label.setSize(1024, 768); //TODO ?
         Poze poze = new Poze();
-        poze.incarcaColectiePoze();
-        colectiePoze = poze.getColectiePoze();
+        colectiePoze = poze.getPoze();
     }
 
     @Override
     public void run() {
-        //cauta afiseazaPoza() si incarcaPoze()
-        label.setText(Integer.toString(temporar));
-
-        //label.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Reclame/Poze/reclama" + temporar + ".png")));
-        //jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/me/myimageapp/newpackage/image.png"))); // NOI18N
-
-        //System.out.println(colectiePoze.size());
-        temporar++;
+        if (index >= colectiePoze.size()) {
+            index = 0;
+        }
+        label.setIcon(colectiePoze.get(index));
+        index++;
     }
 }

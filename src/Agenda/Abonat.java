@@ -24,14 +24,12 @@ public class Abonat implements Serializable /*, Comparator */ {
 
     //org.apache.commons.lang.StringUtils
     //StringUtils.capitalize(Str);
-    //test
 
     public Abonat(String nume, String prenume, String cnp, NrTel telefon, TipTelefon tipTelefon) {
 
         valideazaNumeSauPrenume(nume, Apelativ.NUME);
         valideazaNumeSauPrenume(prenume, Apelativ.PRENUME);
-
-        //TODO throw IllegalArgumentException if one of the parameters are wrong  
+        valideazaCnp(cnp);
         
         this.nume = nume;
         this.prenume = prenume;
@@ -85,17 +83,30 @@ public class Abonat implements Serializable /*, Comparator */ {
         this.cnp = cnp;
     }
 
+    
+    public void valideazaCnp(String cnp) {
+        
+         if (cnp.matches("\\p{L}")) { //TODO nu functioneaza - fix it
+             throw new IllegalArgumentException("Cnp-ul trebuie sa contina doar cifre.");
+         }
+        
+        if (cnp == null || cnp.length() < 13) {
+            throw new IllegalArgumentException("Cnp-ul trebuie sa contina 13 cifre");
+        }
+    }
+    
     public void valideazaNumeSauPrenume(String numeSauPrenume, Apelativ apelativ) {
+        
+        if (numeSauPrenume.matches(".*\\d+.*")) { 
+            throw new IllegalArgumentException(String.format("Campul %s trebuie sa contina doar litere", apelativ.name().toLowerCase()));
+        }
+                
         if (numeSauPrenume == null || numeSauPrenume.length() < 3) {
             throw new IllegalArgumentException(String.format("Campul %s trebuie sa contina minim 3 litere", apelativ.name().toLowerCase()));
         }
 
         if (numeSauPrenume.length() > 30) {
             throw new IllegalArgumentException(String.format("Campul %s trebuie sa contina maxim 30 litere", apelativ.name().toLowerCase()));
-        }
-
-        if (numeSauPrenume.matches(".*\\d+.*")) { //TODO - nu merge
-            throw new IllegalArgumentException(String.format("Campul %s trebuie sa contina doar litere", apelativ.name().toLowerCase()));
         }
     }
 

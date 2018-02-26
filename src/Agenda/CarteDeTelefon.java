@@ -13,13 +13,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
 
 
 /**
@@ -27,11 +25,13 @@ import javax.swing.table.DefaultTableModel;
  */
 public class CarteDeTelefon extends AbstractTableModel implements Serializable {
 
-
     private ArrayList<Abonat> abonati = new ArrayList<>();
 
-
     public void adaugaAbonat(Abonat abonat) {
+        if (isAbonatPresent(abonat.getCnp())) {
+            throw new IllegalArgumentException("Exista deja un abonat cu acest cnp");
+        }
+        
         abonati.add(abonat);
         fireTableDataChanged();
     }
@@ -41,21 +41,53 @@ public class CarteDeTelefon extends AbstractTableModel implements Serializable {
         fireTableDataChanged();
     }
 
-    public void modificaAbonat(Abonat abonat) {
-        //TODO
+    public void modificaAbonat(String cnp, Abonat abonat) {
+
+        int indexAbonat = getAbonatIndexByCnp(cnp);
+        
+        Abonat modificaAbonat = abonati.get(indexAbonat);
+        modificaAbonat.setNume(abonat.getNume());
+        modificaAbonat.setPrenume(abonat.getPrenume());
+        modificaAbonat.setTelefon(abonat.getTelefon());
+        modificaAbonat.setTipTelefon(abonat.getTipTelefon());
+        modificaAbonat.setCnp(abonat.getCnp());  
+        
+        fireTableDataChanged();
     }
 
-    public Abonat cautaAbonat(String nume) {
-        //TODO
-        return null;
+//    public Abonat cautaDupaNume(String nume) {
+//        //TODO ??
+//        return null;
+//    }
+
+    public Abonat getAbonatByCnp(String cnp) {
+        for (int i = 0; i < abonati.size(); i++) {
+            if (abonati.get(i).getCnp().equals(cnp)) {
+                return abonati.get(i);
+            }
+        }
+        throw new IllegalArgumentException("Abonatul nu a fost gasit in lista!");
+    }
+    
+    
+    public int getAbonatIndexByCnp(String cnp) {
+        for (int i = 0; i < abonati.size(); i++) {
+            if (abonati.get(i).getCnp().equals(cnp)) {
+                return i;
+            }
+        }
+        throw new IllegalArgumentException("Abonatul nu a fost gasit in lista!");
     }
 
-    public Abonat cautaAbonatDupaCNP(String CNP) {
-        //TODO
-        return null;
+    public boolean isAbonatPresent(String cnp) {
+        for (int i = 0; i < abonati.size(); i++) {
+            if (abonati.get(i).getCnp().equals(cnp)) {
+                return true;
+            }
+        }
+        return false;
     }
-
-
+    
     public void sortare(SortareDupa sortareDupa, Directie directie) {
 
         switch (sortareDupa) {
@@ -97,7 +129,6 @@ public class CarteDeTelefon extends AbstractTableModel implements Serializable {
         fireTableDataChanged();
     }
 
-
     @Override
     public String toString() {
         return "Agenda contine: " + abonati.size() + " inregistrari.";
@@ -106,7 +137,6 @@ public class CarteDeTelefon extends AbstractTableModel implements Serializable {
     public Abonat getElementAt(int index) {
         return abonati.get(index);
     }
-
 
     @Override
     public int getRowCount() {
@@ -155,17 +185,14 @@ public class CarteDeTelefon extends AbstractTableModel implements Serializable {
         }
     }
     
-    
     public CarteDeTelefon dublura() {
         CarteDeTelefon dublura = new CarteDeTelefon();
         for (int i = 0; i < abonati.size(); i++) {
             dublura.adaugaAbonat(abonati.get(i));
         }
-
         return dublura;
     }
-        
-        
+          
     /**
      * Salveaza obiectul CarteDeTelefon in locatia indicata
      * @param fisier

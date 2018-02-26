@@ -5,61 +5,84 @@
  */
 package Reclame;
 
-
-import java.util.List;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
-import java.util.Arrays;
-import javax.swing.JOptionPane;
+import java.util.List;
+import javax.swing.ImageIcon;
+
 
 /**
  * @author dorumuntean
  */
 public class Poze {
 
-    private static final String LOCATIE_POZE = "/Reclame/Poze/";
+    private List<ImageIcon> colectiePoze = new ArrayList<>();
+    private static String LOCATIE_POZE_INTERNE = "/Poze/reclama%s.png";
+    private static String LOCATIE_POZE_EXTERNE = "src%spoze"; 
 
-    File directorPoze = new File(LOCATIE_POZE);
-    //File[] poze;
-    private List<File> colectiePoze = new ArrayList<File>();
+    
+    public Poze() {
+        LOCATIE_POZE_EXTERNE = String.format(LOCATIE_POZE_EXTERNE, File.separator);
+        colectiePoze = existaPozeExterne() ? incarcaPozeExterne() : incarcaPozeInterne();
+    }
 
-    public List<File> getColectiePoze() {
+    public List<ImageIcon> getPoze() {
         return colectiePoze;
     }
 
-    public void incarcaColectiePoze() {
-        if (!directorPoze.exists() || !directorPoze.isDirectory() || !directorPoze.canRead() || !directorPoze.canExecute()) {
-            //creaza o lista cu numere in loc de poze;
+    public boolean existaFolderPozeExterne() {
+        File folderPoze = new File(LOCATIE_POZE_EXTERNE);
+        return !(!folderPoze.exists() || !folderPoze.isDirectory() || !folderPoze.canRead() || !folderPoze.canExecute());
+    }
+    
+    public boolean existaPozeExterne() {
+            
+        if (!existaFolderPozeExterne()) {
+            return false;
+        }
+            
+        File folderPoze = new File(LOCATIE_POZE_EXTERNE);
+        File[] fisiere = folderPoze.listFiles(filtruPoze(".png"));   
+        return fisiere.length != 0;
+    }
+    
+    public List<ImageIcon> incarcaPozeInterne() {   
+        
+       List<ImageIcon> poze = new ArrayList<>();
+       poze.add(new ImageIcon(getClass().getResource(String.format(LOCATIE_POZE_INTERNE, "1"))));
+       poze.add(new ImageIcon(getClass().getResource(String.format(LOCATIE_POZE_INTERNE, "2"))));
+       poze.add(new ImageIcon(getClass().getResource(String.format(LOCATIE_POZE_INTERNE, "3"))));
 
-            //JOptionPane.showMessageDialog(null, "O erorare!", "EROARE", JOptionPane.ERROR_MESSAGE);
-            //return;
+       return poze;
+    }
+    
+    public List<ImageIcon> incarcaPozeExterne() {
+ 
+            if (!existaPozeExterne()) {
+                //daca apare o eroare intoarcem colectia cu pozele interne
+                return incarcaPozeInterne();
+            } 
+            
+            File folderPoze = new File(LOCATIE_POZE_EXTERNE);
+            FileFilter filtruPng =  filtruPoze(".png");
+            File[] fisiere = folderPoze.listFiles(filtruPng);
 
-        } else {
-            FileFilter filtruPNG = new FileFilter() {
+            List<ImageIcon> colectieIcon = new ArrayList<>();
+                  
+            for (File fisier : fisiere) {
+                colectieIcon.add(new ImageIcon(fisier.getAbsolutePath()));
+            }
+                  
+            return colectieIcon;
+        }
+    
+    public FileFilter filtruPoze(String extensie) {
+        return new FileFilter(){
                 @Override
                 public boolean accept(File f) {
-                    return f.getName().toLowerCase().endsWith(".png");
-                }
-            };
-            File[] fisiere = directorPoze.listFiles(filtruPNG);
-
-            if (fisiere.length == 0) {
-                // JOptionPane.showMessageDialog(null, "Directorul ales nu contine poze JPG!", "EROARE", JOptionPane.ERROR_MESSAGE);
-                //return;
-            }
-
-
-            colectiePoze = Arrays.asList(fisiere);
-        }
+                    return f.getName().toLowerCase().endsWith(extensie);
+                }  
+            }; 
     }
-
-    //this should be a collection of pictures or if not found, some texts..
-
-//        File f = poze.get(pozaCurenta);
-//        ImageIcon i = new ImageIcon(f.getAbsolutePath());
-//        jLabelShareware.setIcon(i);
-//        jLabelShareware.setText("");
-
-
 }

@@ -18,7 +18,7 @@ public class TimerReclame extends Timer {
     private int interval;
 
     public TimerReclame(JLabel label) {
-        this(label, 2000, 1000);
+        this(label, 0, 2000);
     }
 
     public TimerReclame(JLabel label, int delay, int interval) {
@@ -27,11 +27,11 @@ public class TimerReclame extends Timer {
         this.interval = interval;
     }
 
-    public void pornesteReclame() {
+    public void porneste() {
         this.schedule(new TaskReclame(label), delay, interval);
     }
 
-    public void opresteReclame() {
+    public void opreste() {
         this.cancel();
     }
 }
