@@ -131,7 +131,7 @@ public class CarteDeTelefon extends AbstractTableModel implements Serializable {
 
     @Override
     public String toString() {
-        return "Agenda contine: " + abonati.size() + " inregistrari.";
+        return "Agenda contine " + abonati.size() +  (abonati.size() == 1 ? " inregistrare." : " inregistrari.");
     }
 
     public Abonat getElementAt(int index) {

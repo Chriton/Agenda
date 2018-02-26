@@ -16,12 +16,13 @@ public class TimerReclame extends Timer {
     private JLabel label;
     private int delay;
     private int interval;
-
+    
     public TimerReclame(JLabel label) {
         this(label, 0, 2000);
     }
 
     public TimerReclame(JLabel label, int delay, int interval) {
+        super("Timer Reclame");
         this.label = label;
         this.delay = delay;
         this.interval = interval;

@@ -31,7 +31,7 @@ public class Splash extends JFrame {
      * Creates new form SplashTest
      */
     public Splash() {
-       this(10); 
+        this(10); 
     }
     
     public void showSplash() {

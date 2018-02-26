@@ -14,7 +14,7 @@ public enum Directie {
     ASCENDING(1),
     DESCENDING(2);
 
-    private int id;
+    private final int id;
 
     Directie(int id) {
         this.id = id;

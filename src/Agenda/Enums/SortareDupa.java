@@ -17,7 +17,7 @@ public enum SortareDupa {
     TELEFON(3),
     TIP(4);
 
-    private int index;
+    private final int index;
 
     SortareDupa(int index) {
         this.index = index;

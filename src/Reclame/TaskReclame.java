@@ -17,9 +17,9 @@ import javax.swing.JLabel;
  */
 public class TaskReclame extends TimerTask {
 
-    private JLabel label;
+    private final JLabel label;
     private int index = 0;
-    private List<ImageIcon> colectiePoze;
+    private final List<ImageIcon> colectiePoze;
 
     public TaskReclame(JLabel label) {
         this.label = label;

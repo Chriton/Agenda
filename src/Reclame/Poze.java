@@ -19,11 +19,11 @@ public class Poze {
 
     private List<ImageIcon> colectiePoze = new ArrayList<>();
     private static String LOCATIE_POZE_INTERNE = "/Poze/reclama%s.png";
-    private static String LOCATIE_POZE_EXTERNE = "src%spoze"; 
+    private static String LOCATIE_POZE_EXTERNE = String.format("src%spoze", File.separator); 
 
     
     public Poze() {
-        LOCATIE_POZE_EXTERNE = String.format(LOCATIE_POZE_EXTERNE, File.separator);
+        //LOCATIE_POZE_EXTERNE = String.format(LOCATIE_POZE_EXTERNE, File.separator);
         colectiePoze = existaPozeExterne() ? incarcaPozeExterne() : incarcaPozeInterne();
     }
 

@@ -17,6 +17,6 @@ public class NrMobil extends NrTel implements Serializable {
 
     public NrMobil(String numar) {
         super(numar, TipTelefon.MOBIL);
-        valideazaNumar(numar);
+        valideazaNumar(numar); //TODO fix overridable method in constructor message - set private?
     }
 }
