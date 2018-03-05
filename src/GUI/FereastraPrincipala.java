@@ -15,14 +15,13 @@ import Agenda.Enums.SortareDupa;
 import Agenda.Enums.TipTelefon;
 import Reclame.TimerReclame;
 import Utils.Register;
+import Utils.TimerSave;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -64,7 +63,7 @@ public class FereastraPrincipala extends javax.swing.JFrame {
 
         //TODO check if the user is registered, if not start the commercials
         if (!Register.isRegistered()) {
-            reclame = new TimerReclame(jLabelReclame);
+            reclame = new TimerReclame(labelReclame);
             reclame.porneste();
             showRegisteredElements(false);
         } else {
@@ -75,24 +74,24 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         try  {
             model = model.loadFromFile(fisierAbonati); 
         } catch (IOException | ClassNotFoundException e) {
-            showMessage(jLabelInfo, "Fisierul default cu abonati agenda.agd nu exista.");
+            showMessage(labelInfo, "Fisierul default cu abonati agenda.agd nu exista.");
         }
 
         
         //setare model tabel cu abonati
-        jTable1.setModel(model);
-        jTable1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        jTable.setModel(model);
+        jTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         //Pentru sortare prin click pe cap tabel si cautare
-        sorter = new TableRowSorter<>(jTable1.getModel());
-        jTable1.setRowSorter(sorter);
+        sorter = new TableRowSorter<>(jTable.getModel());
+        jTable.setRowSorter(sorter);
         
         //popup menu tabel
         jMenuItemSterge.setText("Sterge");
         jMenuItemModifica.setText("Modifica");
         jPopupMenu.add(jMenuItemSterge);
         jPopupMenu.add(jMenuItemModifica);
-        jTable1.setComponentPopupMenu(jPopupMenu);
+        jTable.setComponentPopupMenu(jPopupMenu);
         
  
         //Combo box tip telefon
@@ -113,14 +112,14 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         File workingDirectory = new File(System.getProperty("user.dir"));
         jFileChooser1.setCurrentDirectory(workingDirectory);
         
-        //TimerSave timerSave = new TimerSave(model, 1, fisierAbonati);
+        //TimerSave timerSave = new TimerSave(jTable1, 1, fisierAbonati);
         //timerSave.porneste();
         
         //TODO - 5min save
-        salvarePeriodica(20000, 10000, jLabelInfo);
+        salvarePeriodica(20000, 10000, labelInfo);
         
         //event listener pentru functia de cautare
-        jTextFieldCauta.getDocument().addDocumentListener(new DocumentListener() {
+        tfSearch.getDocument().addDocumentListener(new DocumentListener() {
         @Override
         public void changedUpdate(DocumentEvent e) {
           //warn();
@@ -135,13 +134,13 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         }
 
         public void warn() {
-           String text = jTextFieldCauta.getText();
+           String text = tfSearch.getText();
             if (text.trim().length() == 0) {
               sorter.setRowFilter(null);
-              jLabelCauta.setText("Puteti cauta abonati dupa nume, prenume, cnp, telefon sau tip telefon.");
+              labelSearch.setText("Puteti cauta abonati dupa nume, prenume, cnp, telefon sau tip telefon.");
             } else {
               sorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
-              jLabelCauta.setText("Puteti cauta abonati dupa nume, prenume, cnp, telefon sau tip telefon. Filtrul de cautare este activ.");
+              labelSearch.setText("Puteti cauta abonati dupa nume, prenume, cnp, telefon sau tip telefon. Filtrul de cautare este activ.");
             }
         }
     });
@@ -176,7 +175,7 @@ public class FereastraPrincipala extends javax.swing.JFrame {
      */
     private void salvarePeriodica(int SaveInterval, int delay, JLabel label) {
                 
-        Timer save = new Timer();
+        Timer save = new Timer("Timer Salvare");
         save.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -193,16 +192,16 @@ public class FereastraPrincipala extends javax.swing.JFrame {
             jMenuInregistrare.setEnabled(false);
             jMenuInregistrare.setVisible(false);
             jSeparator1.setVisible(false);
-            jLabelReclame.setEnabled(false);
-            jLabelReclame.setVisible(false); 
+            labelReclame.setEnabled(false);
+            labelReclame.setVisible(false); 
         } else {
             JMenuOpen.setEnabled(false);
             JMenuSave.setEnabled(false);
             jMenuInregistrare.setEnabled(true);
             jMenuInregistrare.setVisible(true);
             jSeparator1.setVisible(true);
-            jLabelReclame.setEnabled(true);
-            jLabelReclame.setVisible(true);
+            labelReclame.setEnabled(true);
+            labelReclame.setVisible(true);
         }
     }
     
@@ -293,25 +292,23 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         jPopupMenu = new javax.swing.JPopupMenu();
         jMenuItemSterge = new javax.swing.JMenuItem();
         jMenuItemModifica = new javax.swing.JMenuItem();
-        jPanelInfo = new javax.swing.JPanel();
-        jLabelInfo = new javax.swing.JLabel();
-        jPanelReclame = new javax.swing.JPanel();
-        jLabelReclame = new javax.swing.JLabel();
-        jPanelMainBody = new javax.swing.JPanel();
-        jPanelMainPanelTable = new javax.swing.JPanel();
-        jPanelMainTable = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        jPanelSearchForm = new javax.swing.JPanel();
-        jLabelCauta = new javax.swing.JLabel();
-        jTextFieldCauta = new javax.swing.JTextField();
-        jButtonClearSearch = new javax.swing.JButton();
-        jPanelMainPanelButoane = new javax.swing.JPanel();
-        jButtonSorteaza = new javax.swing.JButton();
-        jButtonModifica = new javax.swing.JButton();
-        jButtonSterge = new javax.swing.JButton();
-        jButtonAdauga = new javax.swing.JButton();
-        jButtonIesire = new javax.swing.JButton();
+        Search = new javax.swing.JPanel();
+        labelSearch = new javax.swing.JLabel();
+        tfSearch = new javax.swing.JTextField();
+        bClearSearch = new javax.swing.JButton();
+        Left = new javax.swing.JPanel();
+        bAdauga = new javax.swing.JButton();
+        bSterge = new javax.swing.JButton();
+        bModifica = new javax.swing.JButton();
+        bSorteaza = new javax.swing.JButton();
+        bIesire = new javax.swing.JButton();
+        MainTable = new javax.swing.JPanel();
+        jScrollPane = new javax.swing.JScrollPane();
+        jTable = new javax.swing.JTable();
+        labelReclame = new javax.swing.JLabel();
+        Right = new javax.swing.JPanel();
+        InfoBar = new javax.swing.JPanel();
+        labelInfo = new javax.swing.JLabel();
         MeniuPrincipal = new javax.swing.JMenuBar();
         MeniuFile = new javax.swing.JMenu();
         JMenuOpen = new javax.swing.JMenuItem();
@@ -841,197 +838,197 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         jPopupMenu.add(jMenuItemModifica);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setResizable(false);
-        getContentPane().setLayout(new java.awt.GridBagLayout());
+        setTitle("Agenda");
+        setBounds(new java.awt.Rectangle(0, 0, 800, 650));
+        setMinimumSize(new java.awt.Dimension(800, 650));
+        setName("MainWindow"); // NOI18N
+        setPreferredSize(new java.awt.Dimension(800, 650));
+        setSize(new java.awt.Dimension(800, 600));
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
-        jPanelInfo.setLayout(new java.awt.BorderLayout());
+        Search.setMinimumSize(new java.awt.Dimension(800, 70));
+        Search.setPreferredSize(new java.awt.Dimension(800, 70));
+        Search.setSize(new java.awt.Dimension(800, 70));
 
-        jLabelInfo.setPreferredSize(new java.awt.Dimension(100, 29));
-        jPanelInfo.add(jLabelInfo, java.awt.BorderLayout.CENTER);
+        labelSearch.setText("Puteti cauta abonati dupa nume, prenume, cnp, telefon sau tip telefon.");
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        getContentPane().add(jPanelInfo, gridBagConstraints);
+        tfSearch.setToolTipText("Cauta");
 
-        jPanelReclame.setLayout(new java.awt.BorderLayout());
+        bClearSearch.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Poze/Icons/clear.png"))); // NOI18N
+        bClearSearch.setToolTipText("Clear");
+        bClearSearch.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        bClearSearch.setMaximumSize(new java.awt.Dimension(30, 30));
+        bClearSearch.setMinimumSize(new java.awt.Dimension(30, 30));
+        bClearSearch.setPreferredSize(new java.awt.Dimension(30, 30));
+        bClearSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bClearSearchActionPerformed(evt);
+            }
+        });
 
-        jLabelReclame.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabelReclame.setPreferredSize(new java.awt.Dimension(300, 100));
-        jPanelReclame.add(jLabelReclame, java.awt.BorderLayout.CENTER);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        getContentPane().add(jPanelReclame, gridBagConstraints);
-
-        jPanelMainBody.setLayout(new java.awt.GridBagLayout());
-
-        jPanelMainPanelTable.setLayout(new java.awt.GridBagLayout());
-
-        jScrollPane1.setViewportView(jTable1);
-
-        javax.swing.GroupLayout jPanelMainTableLayout = new javax.swing.GroupLayout(jPanelMainTable);
-        jPanelMainTable.setLayout(jPanelMainTableLayout);
-        jPanelMainTableLayout.setHorizontalGroup(
-            jPanelMainTableLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanelMainTableLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 810, Short.MAX_VALUE)
+        javax.swing.GroupLayout SearchLayout = new javax.swing.GroupLayout(Search);
+        Search.setLayout(SearchLayout);
+        SearchLayout.setHorizontalGroup(
+            SearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(SearchLayout.createSequentialGroup()
+                .addGap(60, 60, 60)
+                .addGroup(SearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(labelSearch)
+                    .addGroup(SearchLayout.createSequentialGroup()
+                        .addComponent(tfSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 672, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(bClearSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(32, Short.MAX_VALUE))
+        );
+        SearchLayout.setVerticalGroup(
+            SearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(SearchLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(labelSearch)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(SearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(bClearSearch, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(tfSearch))
                 .addContainerGap())
         );
-        jPanelMainTableLayout.setVerticalGroup(
-            jPanelMainTableLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanelMainTableLayout.createSequentialGroup()
+
+        getContentPane().add(Search, java.awt.BorderLayout.PAGE_START);
+
+        Left.setMinimumSize(new java.awt.Dimension(60, 500));
+        Left.setPreferredSize(new java.awt.Dimension(60, 500));
+
+        bAdauga.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Poze/Icons/add_user.png"))); // NOI18N
+        bAdauga.setToolTipText("Adauga user");
+        bAdauga.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        bAdauga.setMaximumSize(new java.awt.Dimension(40, 40));
+        bAdauga.setMinimumSize(new java.awt.Dimension(40, 40));
+        bAdauga.setPreferredSize(new java.awt.Dimension(40, 40));
+        bAdauga.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bAdaugaActionPerformed(evt);
+            }
+        });
+        Left.add(bAdauga);
+
+        bSterge.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Poze/Icons/remove_user.png"))); // NOI18N
+        bSterge.setToolTipText("Sterge user");
+        bSterge.setMaximumSize(new java.awt.Dimension(40, 40));
+        bSterge.setMinimumSize(new java.awt.Dimension(40, 40));
+        bSterge.setPreferredSize(new java.awt.Dimension(40, 40));
+        bSterge.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bStergeActionPerformed(evt);
+            }
+        });
+        Left.add(bSterge);
+
+        bModifica.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Poze/Icons/edit.png"))); // NOI18N
+        bModifica.setToolTipText("Modifica user");
+        bModifica.setMaximumSize(new java.awt.Dimension(40, 40));
+        bModifica.setMinimumSize(new java.awt.Dimension(40, 40));
+        bModifica.setPreferredSize(new java.awt.Dimension(40, 40));
+        bModifica.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bModificaActionPerformed(evt);
+            }
+        });
+        Left.add(bModifica);
+
+        bSorteaza.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Poze/Icons/sort.png"))); // NOI18N
+        bSorteaza.setToolTipText("Sorteaza");
+        bSorteaza.setMaximumSize(new java.awt.Dimension(40, 40));
+        bSorteaza.setMinimumSize(new java.awt.Dimension(40, 40));
+        bSorteaza.setPreferredSize(new java.awt.Dimension(40, 40));
+        bSorteaza.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bSorteazaActionPerformed(evt);
+            }
+        });
+        Left.add(bSorteaza);
+
+        bIesire.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Poze/Icons/exit.png"))); // NOI18N
+        bIesire.setToolTipText("Iesire");
+        bIesire.setMaximumSize(new java.awt.Dimension(40, 40));
+        bIesire.setMinimumSize(new java.awt.Dimension(40, 40));
+        bIesire.setPreferredSize(new java.awt.Dimension(40, 40));
+        bIesire.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bIesireActionPerformed(evt);
+            }
+        });
+        Left.add(bIesire);
+
+        getContentPane().add(Left, java.awt.BorderLayout.LINE_START);
+
+        MainTable.setAlignmentX(0.0F);
+        MainTable.setAlignmentY(0.0F);
+        MainTable.setLayout(new java.awt.BorderLayout());
+
+        jTable.setShowGrid(false);
+        jScrollPane.setViewportView(jTable);
+
+        MainTable.add(jScrollPane, java.awt.BorderLayout.CENTER);
+
+        labelReclame.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        labelReclame.setAlignmentY(0.0F);
+        labelReclame.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        labelReclame.setMaximumSize(new java.awt.Dimension(800, 100));
+        labelReclame.setPreferredSize(new java.awt.Dimension(800, 100));
+        MainTable.add(labelReclame, java.awt.BorderLayout.PAGE_END);
+
+        getContentPane().add(MainTable, java.awt.BorderLayout.CENTER);
+
+        Right.setMaximumSize(new java.awt.Dimension(30, 500));
+        Right.setPreferredSize(new java.awt.Dimension(30, 500));
+
+        javax.swing.GroupLayout RightLayout = new javax.swing.GroupLayout(Right);
+        Right.setLayout(RightLayout);
+        RightLayout.setHorizontalGroup(
+            RightLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 30, Short.MAX_VALUE)
+        );
+        RightLayout.setVerticalGroup(
+            RightLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 528, Short.MAX_VALUE)
+        );
+
+        getContentPane().add(Right, java.awt.BorderLayout.LINE_END);
+
+        InfoBar.setMinimumSize(new java.awt.Dimension(800, 30));
+        InfoBar.setPreferredSize(new java.awt.Dimension(800, 30));
+        InfoBar.setSize(new java.awt.Dimension(800, 30));
+
+        labelInfo.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        labelInfo.setToolTipText("");
+        labelInfo.setAlignmentY(0.0F);
+        labelInfo.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        labelInfo.setMaximumSize(new java.awt.Dimension(700, 20));
+        labelInfo.setMinimumSize(new java.awt.Dimension(700, 20));
+        labelInfo.setPreferredSize(new java.awt.Dimension(700, 20));
+        labelInfo.setSize(new java.awt.Dimension(700, 20));
+
+        javax.swing.GroupLayout InfoBarLayout = new javax.swing.GroupLayout(InfoBar);
+        InfoBar.setLayout(InfoBarLayout);
+        InfoBarLayout.setHorizontalGroup(
+            InfoBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, InfoBarLayout.createSequentialGroup()
+                .addGap(61, 61, 61)
+                .addComponent(labelInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 700, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(39, 39, 39))
+        );
+        InfoBarLayout.setVerticalGroup(
+            InfoBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(InfoBarLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 298, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(labelInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(4, Short.MAX_VALUE))
         );
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        jPanelMainPanelTable.add(jPanelMainTable, gridBagConstraints);
-
-        jPanelSearchForm.setLayout(new java.awt.GridBagLayout());
-
-        jLabelCauta.setText("Puteti cauta abonati dupa nume, prenume, cnp, telefon sau tip telefon.");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        jPanelSearchForm.add(jLabelCauta, gridBagConstraints);
-
-        jTextFieldCauta.setToolTipText("Cauta");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        jPanelSearchForm.add(jTextFieldCauta, gridBagConstraints);
-
-        jButtonClearSearch.setText("X");
-        jButtonClearSearch.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonClearSearchActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        jPanelSearchForm.add(jButtonClearSearch, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        jPanelMainPanelTable.add(jPanelSearchForm, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 0.7;
-        jPanelMainBody.add(jPanelMainPanelTable, gridBagConstraints);
-
-        jButtonSorteaza.setText("Sorteaza");
-        jButtonSorteaza.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonSorteazaActionPerformed(evt);
-            }
-        });
-
-        jButtonModifica.setText("Modifica");
-        jButtonModifica.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonModificaActionPerformed(evt);
-            }
-        });
-
-        jButtonSterge.setText("Sterge");
-        jButtonSterge.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonStergeActionPerformed(evt);
-            }
-        });
-
-        jButtonAdauga.setText("Adauga");
-        jButtonAdauga.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonAdaugaActionPerformed(evt);
-            }
-        });
-
-        jButtonIesire.setText("Iesire");
-        jButtonIesire.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonIesireActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanelMainPanelButoaneLayout = new javax.swing.GroupLayout(jPanelMainPanelButoane);
-        jPanelMainPanelButoane.setLayout(jPanelMainPanelButoaneLayout);
-        jPanelMainPanelButoaneLayout.setHorizontalGroup(
-            jPanelMainPanelButoaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 105, Short.MAX_VALUE)
-            .addGroup(jPanelMainPanelButoaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanelMainPanelButoaneLayout.createSequentialGroup()
-                    .addGap(1, 1, 1)
-                    .addGroup(jPanelMainPanelButoaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jButtonModifica)
-                        .addComponent(jButtonAdauga)
-                        .addComponent(jButtonSterge)
-                        .addComponent(jButtonSorteaza)
-                        .addComponent(jButtonIesire))
-                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-        );
-
-        jPanelMainPanelButoaneLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jButtonAdauga, jButtonIesire, jButtonModifica, jButtonSorteaza, jButtonSterge});
-
-        jPanelMainPanelButoaneLayout.setVerticalGroup(
-            jPanelMainPanelButoaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 438, Short.MAX_VALUE)
-            .addGroup(jPanelMainPanelButoaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanelMainPanelButoaneLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jButtonAdauga)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jButtonSterge)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jButtonModifica)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jButtonSorteaza)
-                    .addGap(151, 151, 151)
-                    .addComponent(jButtonIesire)
-                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-        );
-
-        jPanelMainPanelButoaneLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jButtonAdauga, jButtonIesire, jButtonModifica, jButtonSorteaza, jButtonSterge});
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 0.3;
-        jPanelMainBody.add(jPanelMainPanelButoane, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        getContentPane().add(jPanelMainBody, gridBagConstraints);
+        getContentPane().add(InfoBar, java.awt.BorderLayout.PAGE_END);
 
         MeniuPrincipal.setName(""); // NOI18N
 
@@ -1142,10 +1139,10 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButtonIesireActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonIesireActionPerformed
+    private void bIesireActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bIesireActionPerformed
         jDialogIesire.setLocationRelativeTo(null);
         jDialogIesire.setVisible(true);
-    }//GEN-LAST:event_jButtonIesireActionPerformed
+    }//GEN-LAST:event_bIesireActionPerformed
 
     private void JMenuIesireActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JMenuIesireActionPerformed
         jDialogIesire.setLocationRelativeTo(null);
@@ -1168,9 +1165,9 @@ public class FereastraPrincipala extends javax.swing.JFrame {
                 File fisierSelectat = jFileChooser1.getSelectedFile();
 
                 model = model.loadFromFile(fisierSelectat);  //load(fisierSelectat);
-                jTable1.setModel(model);
-                sorter = new TableRowSorter<>(jTable1.getModel());
-                jTable1.setRowSorter(sorter);
+                jTable.setModel(model);
+                sorter = new TableRowSorter<>(jTable.getModel());
+                jTable.setRowSorter(sorter);
             }
         } catch (IOException | ClassNotFoundException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -1196,13 +1193,13 @@ public class FereastraPrincipala extends javax.swing.JFrame {
     }//GEN-LAST:event_JMenuSaveActionPerformed
 
     public void verificaTabel() {
-        int selected = jTable1.getSelectedRow();
+        int selected = jTable.getSelectedRow();
 
-        if (jTable1.getRowCount() < 1) {
+        if (jTable.getRowCount() < 1) {
             throw new IllegalStateException("Lista nu contine abonati!");
         }
 
-        if (selected == -1 || jTable1.getColumnCount() == 0) {
+        if (selected == -1 || jTable.getColumnCount() == 0) {
             throw new IllegalStateException("Selectati un abonat din tabel!");
         }
     }
@@ -1217,7 +1214,7 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         try {
             verificaTabel();
 
-            String cnp = jTable1.getValueAt(jTable1.getSelectedRow(), 2).toString();
+            String cnp = jTable.getValueAt(jTable.getSelectedRow(), 2).toString();
             abonatDeModificat = model.getAbonatByCnp(cnp);            
             
             String nume = abonatDeModificat.getNume();
@@ -1237,7 +1234,7 @@ public class FereastraPrincipala extends javax.swing.JFrame {
          try {
             verificaTabel();
             
-            String cnp = jTable1.getValueAt(jTable1.getSelectedRow(), 2).toString();
+            String cnp = jTable.getValueAt(jTable.getSelectedRow(), 2).toString();
             abonatDeModificat = model.getAbonatByCnp(cnp); 
             
             
@@ -1256,7 +1253,7 @@ public class FereastraPrincipala extends javax.swing.JFrame {
     }
     
     public void sorteaza() {
-        if (jTable1.getRowCount() < 1) {
+        if (jTable.getRowCount() < 1) {
             JOptionPane.showMessageDialog(this, "Lista de abonati este goala. Nu aveti ce sorta!", "Info", JOptionPane.INFORMATION_MESSAGE);
         } else {
             jDialogSortare.setLocationRelativeTo(null);
@@ -1267,9 +1264,9 @@ public class FereastraPrincipala extends javax.swing.JFrame {
     public void salveazaAgenda() {
         try {
             model.saveToFile(fisierAbonati);
-            showMessage(jLabelInfo, "Datele din agenda au fost salvate.");
+            showMessage(labelInfo, "Datele din agenda au fost salvate.");
         } catch (IOException ex) {
-            showMessage(jLabelInfo, ex.getMessage());
+            showMessage(labelInfo, ex.getMessage());
         }
     }
     
@@ -1277,9 +1274,9 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         adauga();
     }//GEN-LAST:event_jMenuAdaugaActionPerformed
 
-    private void jButtonAdaugaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAdaugaActionPerformed
+    private void bAdaugaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bAdaugaActionPerformed
         adauga();
-    }//GEN-LAST:event_jButtonAdaugaActionPerformed
+    }//GEN-LAST:event_bAdaugaActionPerformed
 
     private void jButtonInchideActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonInchideActionPerformed
         jDialogAdauga.dispose();
@@ -1312,7 +1309,7 @@ public class FereastraPrincipala extends javax.swing.JFrame {
             model.adaugaAbonat(abonat);
             
             jDialogAdauga.dispose();
-            showMessage(jLabelInfo, String.format("Abonatul %s %s a fost adaugat.", abonat.getNume(), abonat.getPrenume()));
+            showMessage(labelInfo, String.format("Abonatul %s %s a fost adaugat.", abonat.getNume(), abonat.getPrenume()));
         } catch (IllegalArgumentException e) {
              JOptionPane.showMessageDialog(this, e.getMessage(), "Eroare", JOptionPane.ERROR_MESSAGE);
         }
@@ -1328,13 +1325,13 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         String nume = abonatDeModificat.getNume();
         String prenume = abonatDeModificat.getPrenume();
         model.stergeAbonat(abonatDeModificat);
-        showMessage(jLabelInfo, String.format("Abonatul %s %s a fost sters", nume, prenume));
+        showMessage(labelInfo, String.format("Abonatul %s %s a fost sters", nume, prenume));
         jDialogSterge.dispose();
     }//GEN-LAST:event_jButtonStergeAbonatActionPerformed
     
-    private void jButtonStergeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonStergeActionPerformed
+    private void bStergeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bStergeActionPerformed
         sterge();
-    }//GEN-LAST:event_jButtonStergeActionPerformed
+    }//GEN-LAST:event_bStergeActionPerformed
 
     private void jMenuStergeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuStergeActionPerformed
         sterge();
@@ -1344,9 +1341,9 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         jDialogSortare.dispose();
     }//GEN-LAST:event_jButtonSorteazaInapoiActionPerformed
 
-    private void jButtonSorteazaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSorteazaActionPerformed
+    private void bSorteazaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSorteazaActionPerformed
         sorteaza();
-    }//GEN-LAST:event_jButtonSorteazaActionPerformed
+    }//GEN-LAST:event_bSorteazaActionPerformed
 
     private void jButtonSorteazaSorteazaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSorteazaSorteazaActionPerformed
         int coloana = SortareDupa.valueOf(jComboBoxSortare.getSelectedItem().toString()).getIndex();
@@ -1395,7 +1392,7 @@ public class FereastraPrincipala extends javax.swing.JFrame {
             model.modificaAbonat(abonatDeModificat.getCnp(), abonatDateNoi);
             
             jDialogModifica.dispose();
-            showMessage(jLabelInfo, String.format("Abonatul %s %s a fost modificat.", nume, prenume));
+            showMessage(labelInfo, String.format("Abonatul %s %s a fost modificat.", nume, prenume));
         } catch (IllegalArgumentException e) {
              JOptionPane.showMessageDialog(this, e.getMessage(), "Eroare", JOptionPane.ERROR_MESSAGE);
         }
@@ -1403,9 +1400,9 @@ public class FereastraPrincipala extends javax.swing.JFrame {
 
     }//GEN-LAST:event_jButtonModificaAbonatActionPerformed
     
-    private void jButtonModificaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonModificaActionPerformed
+    private void bModificaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bModificaActionPerformed
         modifica();
-    }//GEN-LAST:event_jButtonModificaActionPerformed
+    }//GEN-LAST:event_bModificaActionPerformed
 
     private void jMenuModificaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuModificaActionPerformed
         modifica();
@@ -1433,10 +1430,6 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         }          
     }//GEN-LAST:event_jButtonInregistreazaActionPerformed
 
-    private void jButtonClearSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonClearSearchActionPerformed
-        jTextFieldCauta.setText("");
-    }//GEN-LAST:event_jButtonClearSearchActionPerformed
-
     private void jMenuItemStergeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemStergeActionPerformed
         sterge();
     }//GEN-LAST:event_jMenuItemStergeActionPerformed
@@ -1452,6 +1445,14 @@ public class FereastraPrincipala extends javax.swing.JFrame {
     private void jDialogInregistrareWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_jDialogInregistrareWindowClosing
         jTextFieldRegisterCode.setText("");
     }//GEN-LAST:event_jDialogInregistrareWindowClosing
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        salveazaAgenda(); 
+    }//GEN-LAST:event_formWindowClosing
+
+    private void bClearSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bClearSearchActionPerformed
+        tfSearch.setText("");
+    }//GEN-LAST:event_bClearSearchActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1497,32 +1498,37 @@ public class FereastraPrincipala extends javax.swing.JFrame {
  
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel InfoBar;
     private javax.swing.JMenuItem JMenuIesire;
     private javax.swing.JMenuItem JMenuOpen;
     private javax.swing.JMenuItem JMenuSave;
+    private javax.swing.JPanel Left;
+    private javax.swing.JPanel MainTable;
     private javax.swing.JMenu MeniuAbonati;
     private javax.swing.JMenu MeniuFile;
     private javax.swing.JMenu MeniuHelp;
     private javax.swing.JMenuBar MeniuPrincipal;
+    private javax.swing.JPanel Right;
+    private javax.swing.JPanel Search;
     private javax.swing.JPopupMenu.Separator Separator;
-    private javax.swing.JButton jButtonAdauga;
+    private javax.swing.JButton bAdauga;
+    private javax.swing.JButton bClearSearch;
+    private javax.swing.JButton bIesire;
+    private javax.swing.JButton bModifica;
+    private javax.swing.JButton bSorteaza;
+    private javax.swing.JButton bSterge;
     private javax.swing.JButton jButtonAdaugaAbonat;
-    private javax.swing.JButton jButtonClearSearch;
     private javax.swing.JButton jButtonDa;
-    private javax.swing.JButton jButtonIesire;
     private javax.swing.JButton jButtonInapoi;
     private javax.swing.JButton jButtonInchide;
     private javax.swing.JButton jButtonInchide1;
     private javax.swing.JButton jButtonInregistreaza;
-    private javax.swing.JButton jButtonModifica;
     private javax.swing.JButton jButtonModificaAbonat;
     private javax.swing.JButton jButtonNu;
     private javax.swing.JButton jButtonNuSterge;
     private javax.swing.JButton jButtonOk;
-    private javax.swing.JButton jButtonSorteaza;
     private javax.swing.JButton jButtonSorteazaInapoi;
     private javax.swing.JButton jButtonSorteazaSorteaza;
-    private javax.swing.JButton jButtonSterge;
     private javax.swing.JButton jButtonStergeAbonat;
     private javax.swing.JComboBox<String> jComboBoxDirectieSortare;
     private javax.swing.JComboBox<String> jComboBoxPhoneType;
@@ -1548,11 +1554,8 @@ public class FereastraPrincipala extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JLabel jLabelAgenda;
-    private javax.swing.JLabel jLabelCauta;
     private javax.swing.JLabel jLabelConfirmare;
-    private javax.swing.JLabel jLabelInfo;
     private javax.swing.JLabel jLabelNume;
-    private javax.swing.JLabel jLabelReclame;
     private javax.swing.JLabel jLabelSterge;
     private javax.swing.JMenuItem jMenuAbout;
     private javax.swing.JMenuItem jMenuAdauga;
@@ -1571,25 +1574,17 @@ public class FereastraPrincipala extends javax.swing.JFrame {
     private javax.swing.JPanel jPanelForm;
     private javax.swing.JPanel jPanelForm1;
     private javax.swing.JPanel jPanelFormInregistrare;
-    private javax.swing.JPanel jPanelInfo;
-    private javax.swing.JPanel jPanelMainBody;
-    private javax.swing.JPanel jPanelMainPanelButoane;
-    private javax.swing.JPanel jPanelMainPanelTable;
-    private javax.swing.JPanel jPanelMainTable;
-    private javax.swing.JPanel jPanelReclame;
-    private javax.swing.JPanel jPanelSearchForm;
     private javax.swing.JPanel jPanelSortareButoane;
     private javax.swing.JPanel jPanelSortareForm;
     private javax.swing.JPanel jPanelStergeButoane;
     private javax.swing.JPanel jPanelStergeForm;
     private javax.swing.JPanel jPanelTextIesire;
     private javax.swing.JPopupMenu jPopupMenu;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane;
     private javax.swing.JPopupMenu.Separator jSeparator1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable jTable;
     private javax.swing.JTextField jTextCnp;
     private javax.swing.JTextField jTextCnp1;
-    private javax.swing.JTextField jTextFieldCauta;
     private javax.swing.JTextField jTextFieldRegisterCode;
     private javax.swing.JTextField jTextFirstName;
     private javax.swing.JTextField jTextFirstName1;
@@ -1597,6 +1592,10 @@ public class FereastraPrincipala extends javax.swing.JFrame {
     private javax.swing.JTextField jTextLastName1;
     private javax.swing.JTextField jTextPhone;
     private javax.swing.JTextField jTextPhone1;
+    private javax.swing.JLabel labelInfo;
+    private javax.swing.JLabel labelReclame;
+    private javax.swing.JLabel labelSearch;
+    private javax.swing.JTextField tfSearch;
     // End of variables declaration//GEN-END:variables
 }
 
