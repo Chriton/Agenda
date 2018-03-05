@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Agenda;
 
 import Agenda.Enums.Directie;
@@ -55,10 +50,23 @@ public class CarteDeTelefon extends AbstractTableModel implements Serializable {
         fireTableDataChanged();
     }
 
-//    public Abonat cautaDupaNume(String nume) {
-//        //TODO ??
-//        return null;
-//    }
+    public Abonat cautaDupaNume(String nume) {
+        for (int i = 0; i < abonati.size(); i++) {
+            if (abonati.get(i).getNume().equalsIgnoreCase(nume)) {
+                return abonati.get(i);
+            }
+        }
+        throw new IllegalArgumentException("Abonatul nu a fost gasit in lista!");
+    }
+
+    public Abonat cautaDupaPrenume(String prenume) {
+        for (int i = 0; i < abonati.size(); i++) {
+            if (abonati.get(i).getPrenume().equalsIgnoreCase(prenume)) {
+                return abonati.get(i);
+            }
+        }
+        throw new IllegalArgumentException("Abonatul nu a fost gasit in lista!");
+    }
 
     public Abonat getAbonatByCnp(String cnp) {
         for (int i = 0; i < abonati.size(); i++) {
@@ -68,8 +76,7 @@ public class CarteDeTelefon extends AbstractTableModel implements Serializable {
         }
         throw new IllegalArgumentException("Abonatul nu a fost gasit in lista!");
     }
-    
-    
+
     public int getAbonatIndexByCnp(String cnp) {
         for (int i = 0; i < abonati.size(); i++) {
             if (abonati.get(i).getCnp().equals(cnp)) {
@@ -79,6 +86,11 @@ public class CarteDeTelefon extends AbstractTableModel implements Serializable {
         throw new IllegalArgumentException("Abonatul nu a fost gasit in lista!");
     }
 
+    /**
+     * Checks if the user is present.
+     * @param cnp - the CNP of the user
+     * @return true if the user is present, false otherwise
+     */
     public boolean isAbonatPresent(String cnp) {
         for (int i = 0; i < abonati.size(); i++) {
             if (abonati.get(i).getCnp().equals(cnp)) {
@@ -111,7 +123,12 @@ public class CarteDeTelefon extends AbstractTableModel implements Serializable {
         }
     }
 
-    public void sortBy(Comparator c, Directie directie) {
+    /**
+     * Sort a ArrayList<Abonat> by the provided comparator and direction
+     * @param c - the Comparator<Abonat> to use
+     * @param directie - direction of the sorting. Can be ASCENDING or DESCENDING
+     */
+    public void sortBy(Comparator<Abonat> c, Directie directie) {
         if (directie == Directie.ASCENDING) {
             sort(c);
         } else if (directie == Directie.DESCENDING) {
@@ -119,13 +136,23 @@ public class CarteDeTelefon extends AbstractTableModel implements Serializable {
         }
     }
 
-    public void sort(Comparator c) {
+    /**
+     * Sort ascending a a ArrayList<Abonat> list
+     * @param c - the Comparator<Abonat> to use
+     */
+    public void sort(Comparator<Abonat> c) {
         Collections.sort(abonati, c);
+        //abonati.sort(c);
         fireTableDataChanged();
     }
 
-    public void sortRev(Comparator c) {
+    /**
+     * Sort descending a a ArrayList<Abonat> list
+     * @param c - the Comparator<Abonat> to use
+     */
+    public void sortRev(Comparator<Abonat> c) {
         Collections.sort(abonati, Collections.reverseOrder(c));
+        //abonati.sort(Collections.reverseOrder(c));
         fireTableDataChanged();
     }
 
@@ -184,7 +211,11 @@ public class CarteDeTelefon extends AbstractTableModel implements Serializable {
                 throw new IndexOutOfBoundsException();
         }
     }
-    
+
+    /**
+     * Creates and returns a copy of a CarteDeTelefon object
+     * @return a copy of the CarteDeTelefon object
+     */
     public CarteDeTelefon dublura() {
         CarteDeTelefon dublura = new CarteDeTelefon();
         for (int i = 0; i < abonati.size(); i++) {
@@ -194,45 +225,52 @@ public class CarteDeTelefon extends AbstractTableModel implements Serializable {
     }
           
     /**
-     * Salveaza obiectul CarteDeTelefon in locatia indicata
-     * @param fisier
-     * @throws IOException 
+     * Saves a CarteDeTelefon object in the provided location
+     * @param file - the File to save the data to
+     * @throws IOException
+     * @throws IllegalStateException
      */
-    public void saveToFile(File fisier) throws IOException {
+    public void saveToFile(File file) throws IOException, IllegalStateException {
         try {
 
-            if (fisier.exists() && !fisier.canWrite()) {
-                throw new IOException("Nu exista permisiuni de scriere in locatia aleasa!");
+            if (file.exists() && !file.canWrite()) {
+                throw new IllegalStateException("Nu exista permisiuni de scriere in locatia aleasa.");
             }
-            try (FileOutputStream fos = new FileOutputStream(fisier); ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+            
+            try (FileOutputStream fos = new FileOutputStream(file); ObjectOutputStream oos = new ObjectOutputStream(fos)) {
                 oos.writeObject(this.dublura());
             }
         } catch (IOException se) {
-            throw new IOException("Fisierul nu a putut fi salvat!");
+            throw new IOException("Fisierul nu a putut fi salvat.");
         }
     }
     
     /**
-     * Incarca si returneaza un obiect CarteDeTelefon din locatia indicata
-     * @param fisier
-     * @return
+     * Loads and returns a CarteDeTelefon object from the provided location
+     * @param file - the File to load the data from
+     * @return CarteDeTelefon object
      * @throws IOException
-     * @throws ClassNotFoundException 
+     * @throws ClassNotFoundException
+     * @throws IllegalStateException
      */
-    public CarteDeTelefon loadFromFile(File fisier) throws IOException, ClassNotFoundException {
-        if (!fisier.exists() || !fisier.isFile() || !fisier.canRead()) {
-            throw new IOException("Nu am putut sa citesc fisierul!");
+    public CarteDeTelefon loadFromFile(File file) throws IOException, ClassNotFoundException, IllegalStateException {
+        if (!file.exists() || !file.isFile()) {
+            throw new IllegalStateException("Fisierul default cu abonati nu exista.");
+        }
+        
+        if (!file.canRead()) {
+            throw new IllegalStateException("Fisierul cu abonati exista, insa nu poate fi citit.");
         }
 
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fisier));) {
-          
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));) {
+           
             CarteDeTelefon carte = (CarteDeTelefon) ois.readObject();
-            return carte;
+            return carte;  
 
         } catch (IOException e) {
-            throw new IOException("Nu am putut sa citesc fisierul");
+            throw new IOException("Nu am putut sa citesc fisierul.");
         } catch (ClassNotFoundException e) {
-            throw new ClassNotFoundException("Nu am putut sa citesc fisierul");
+            throw new ClassNotFoundException("Nu am putut sa citesc fisierul.");
         }
     }
 }

@@ -1,14 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Utils;
 
 import Agenda.CarteDeTelefon;
 import java.io.File;
 import java.io.IOException;
 import java.util.TimerTask;
+import javax.swing.JLabel;
 import javax.swing.JTable;
 
 /**
@@ -19,25 +15,25 @@ public class TaskSave extends TimerTask {
     
     CarteDeTelefon carteDeTelefon;
     JTable tabelAbonati;
+    JLabel label;
     File file;
     
-    public TaskSave(JTable tabelAbonati, File file) {
-        this.file = file;
+    public TaskSave(JTable tabelAbonati, JLabel label, File file) {
         this.tabelAbonati = tabelAbonati;
+        this.label = label;
+        this.file = file;
     }
     
     @Override
     public void run() {
         try {
             
-            //todo is instanceof check
             carteDeTelefon = (CarteDeTelefon)tabelAbonati.getModel();
-            
             carteDeTelefon.saveToFile(file);
-            System.out.println("Datele au fost salvate"); //TODO host to throw exception here? 
+            Message.showMessage(label, "Datele au fost salvate.");
+            
         } catch (IOException ex) {
-            System.out.println("Nu am putut salva datele.");   
-           // throw new IOException("Nu am putut salva datele");//fix
+            Message.showMessage(label, "Nu am putut salva datele.");
         }
     }
 }

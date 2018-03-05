@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Agenda;
 
 import Agenda.Enums.Apelativ;
@@ -14,7 +9,7 @@ import java.util.Comparator;
 /**
  * @author dorumuntean
  */
-public class Abonat implements Serializable /*, Comparator */ {
+public class Abonat implements Serializable {
 
     private String nume;
     private String prenume;
@@ -22,15 +17,12 @@ public class Abonat implements Serializable /*, Comparator */ {
     private NrTel telefon;
     private TipTelefon tipTelefon;
 
-    //org.apache.commons.lang.StringUtils
-    //StringUtils.capitalize(Str);
-
     public Abonat(String nume, String prenume, String cnp, NrTel telefon, TipTelefon tipTelefon) {
 
         valideazaNumeSauPrenume(nume, Apelativ.NUME);
         valideazaNumeSauPrenume(prenume, Apelativ.PRENUME);
         valideazaCnp(cnp);
-        
+
         this.nume = nume;
         this.prenume = prenume;
         this.cnp = cnp;
@@ -83,25 +75,24 @@ public class Abonat implements Serializable /*, Comparator */ {
         this.cnp = cnp;
     }
 
-    
-    public void valideazaCnp(String cnp) {
-        
-         if (cnp.matches("\\p{L}")) { //TODO nu functioneaza - fix it
-             throw new IllegalArgumentException("Cnp-ul trebuie sa contina doar cifre.");
-         }
-        
-        if (cnp == null || cnp.length() < 13) {
+    private void valideazaCnp(String cnp) {
+
+        if (cnp == null || cnp.length() != 13 ) {
             throw new IllegalArgumentException("Cnp-ul trebuie sa contina 13 cifre");
         }
+                
+        if (!cnp.matches("\\b[1-8]\\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\\d|3[01])(0[1-9]|[1-4]\\d|5[0-2]|99)\\d{4}\\b")) {
+            throw new IllegalArgumentException("Cnp-ul nu este valid.");
+        }
     }
-    
-    public void valideazaNumeSauPrenume(String numeSauPrenume, Apelativ apelativ) {
-        
-        if (numeSauPrenume.matches(".*\\d+.*")) { 
+
+    private void valideazaNumeSauPrenume(String numeSauPrenume, Apelativ apelativ) {
+
+        if (numeSauPrenume.matches(".*\\d+.*")) {
             throw new IllegalArgumentException(String.format("Campul %s trebuie sa contina doar litere", apelativ.name().toLowerCase()));
         }
-                
-        if (numeSauPrenume == null || numeSauPrenume.length() < 3) {
+
+        if (numeSauPrenume.length() < 3) {
             throw new IllegalArgumentException(String.format("Campul %s trebuie sa contina minim 3 litere", apelativ.name().toLowerCase()));
         }
 
@@ -110,15 +101,7 @@ public class Abonat implements Serializable /*, Comparator */ {
         }
     }
 
-//    @Override
-//    public int compare(Object o1, Object o2) {
-//        //TODO
-//    }
-
-
     public static Comparator<Abonat> dupaNume() {
-
-        //return (Abonat a1, Abonat a2) -> a1.getNume().compareToIgnoreCase(a2.getNume());
 
         return new Comparator<Abonat>() {
             @Override
@@ -127,7 +110,6 @@ public class Abonat implements Serializable /*, Comparator */ {
             }
         };
     }
-
 
     public static Comparator<Abonat> dupaPrenume() {
 

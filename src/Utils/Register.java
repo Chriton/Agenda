@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Utils;
 
 import java.io.File;
@@ -20,11 +15,11 @@ import java.io.Serializable;
 public class Register implements Serializable {
     
     private static final String REGISTRATION_FILE = "src%sregister.reg"; 
-    private static final String registrationCode = "test";
+    private static final String REGISTRATION_CODE = "test";
     private final String registered;
 
     public Register(boolean register) {
-        registered = register + registrationCode;  
+        registered = register + REGISTRATION_CODE;  
     }
     
     @Override
@@ -34,7 +29,7 @@ public class Register implements Serializable {
     
     
     public static String getRegistrationCode() {
-        return registrationCode;
+        return REGISTRATION_CODE;
     }
     
     private static boolean existaFisierRegister() {
@@ -71,7 +66,7 @@ public class Register implements Serializable {
             
             File fisierRegister = new File(String.format(REGISTRATION_FILE, File.separator));
             
-            //daca nu putem sa citim fisierul de inregistrare, incercam sa il stergem si sa il scriem din nou
+            //daca nu putem sa scriem fisierul de inregistrare, il stergem si incercam sa il scriem din nou
             if (fisierRegister.exists() && !fisierRegister.canWrite()) {
                 if (!fisierRegister.delete()) {
                    throw new IOException("Fisierul de inregistrare corupt nu poate fi sters! Nu exista permisiuni de scriere."); 

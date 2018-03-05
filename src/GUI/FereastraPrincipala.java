@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package GUI;
 
 import Agenda.Abonat;
@@ -14,6 +9,7 @@ import Agenda.NrTel;
 import Agenda.Enums.SortareDupa;
 import Agenda.Enums.TipTelefon;
 import Reclame.TimerReclame;
+import Utils.Message;
 import Utils.Register;
 import Utils.TimerSave;
 import java.io.File;
@@ -22,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -61,7 +58,7 @@ public class FereastraPrincipala extends javax.swing.JFrame {
                 
         initComponents();
 
-        //TODO check if the user is registered, if not start the commercials
+        //Verifica daca userul este inregistrat, daca nu este atunci pornim reclamele
         if (!Register.isRegistered()) {
             reclame = new TimerReclame(labelReclame);
             reclame.porneste();
@@ -72,9 +69,10 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         
         //daca fisierul cu abonati exista si poate fi citit, incarca datele din el
         try  {
-            model = model.loadFromFile(fisierAbonati); 
-        } catch (IOException | ClassNotFoundException e) {
-            showMessage(labelInfo, "Fisierul default cu abonati agenda.agd nu exista.");
+            model = model.loadFromFile(fisierAbonati);
+            Message.showMessage(labelInfo, "Datele au fost incarcate.");
+        } catch (IOException | ClassNotFoundException | IllegalStateException e) {
+            Message.showMessage(labelInfo, e.getMessage());
         }
 
         
@@ -95,16 +93,16 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         
  
         //Combo box tip telefon
-        DefaultComboBoxModel tipuriTelefon = new DefaultComboBoxModel(TipTelefon.lista());
+        DefaultComboBoxModel<String> tipuriTelefon = new DefaultComboBoxModel<>(TipTelefon.lista());
         jComboBoxPhoneType1.setModel(tipuriTelefon);
         jComboBoxPhoneType.setModel(tipuriTelefon);
 
         //Combo box - sortare dupa
-        DefaultComboBoxModel modelSortare = new DefaultComboBoxModel(SortareDupa.lista());
+        DefaultComboBoxModel<String> modelSortare = new DefaultComboBoxModel<>(SortareDupa.lista());
         jComboBoxSortare.setModel(modelSortare);
 
         //Combo box - directie sortare
-        DefaultComboBoxModel modelDirectieSortare = new DefaultComboBoxModel(Directie.lista());
+        ComboBoxModel<String> modelDirectieSortare = new DefaultComboBoxModel<>(Directie.lista());
         jComboBoxDirectieSortare.setModel(modelDirectieSortare);
         
         //Filtru pentru FileChooser si CurrentDirectory
@@ -112,11 +110,12 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         File workingDirectory = new File(System.getProperty("user.dir"));
         jFileChooser1.setCurrentDirectory(workingDirectory);
         
-        //TimerSave timerSave = new TimerSave(jTable1, 1, fisierAbonati);
-        //timerSave.porneste();
+        //Salvare periodica a datelor - metoda 1 mai complexa
+        TimerSave timerSave = new TimerSave(jTable, labelInfo, 1, fisierAbonati);
+        timerSave.porneste();
         
-        //TODO - 5min save
-        salvarePeriodica(20000, 10000, labelInfo);
+        //Salvare periodica a datelor -  metoda 2 - mai simppla
+        //salvarePeriodica(20000, 10000, labelInfo);
         
         //event listener pentru functia de cautare
         tfSearch.getDocument().addDocumentListener(new DocumentListener() {
@@ -147,31 +146,9 @@ public class FereastraPrincipala extends javax.swing.JFrame {
 
     }
 
- 
+
     /**
-     * This will show a new message in a label, and dissappear after 10sec.
-     * 
-     * @param newMessage 
-     */
-    private void showMessage(JLabel label, String newMessage) {  
-        Timer timer = new Timer("Timer Message");
-        //show the new message
-        label.setText(newMessage);
-        
-        //clear the message after 10sec
-        TimerTask task = new TimerTask() {
-        @Override
-        public void run() {
-            label.setText(""); 
-            timer.cancel();
-            }
-        };
-        
-        timer.schedule(task, 10000);  
-    }
-        
-    /**
-     * Salveaza agenda la fiecare X min
+     * Salveaza agenda la fiecare X min - metoda mai simpla
      */
     private void salvarePeriodica(int SaveInterval, int delay, JLabel label) {
                 
@@ -327,6 +304,7 @@ public class FereastraPrincipala extends javax.swing.JFrame {
 
         jDialogIesire.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         jDialogIesire.setTitle("Confirmare");
+        jDialogIesire.setBounds(new java.awt.Rectangle(0, 0, 300, 200));
         jDialogIesire.setMinimumSize(new java.awt.Dimension(300, 200));
         jDialogIesire.setModal(true);
         jDialogIesire.setResizable(false);
@@ -430,9 +408,11 @@ public class FereastraPrincipala extends javax.swing.JFrame {
 
         jDialogAdauga.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         jDialogAdauga.setTitle("Adauga");
-        jDialogAdauga.setMinimumSize(new java.awt.Dimension(400, 300));
+        jDialogAdauga.setBounds(new java.awt.Rectangle(0, 0, 400, 250));
+        jDialogAdauga.setMinimumSize(new java.awt.Dimension(400, 250));
         jDialogAdauga.setModal(true);
         jDialogAdauga.setResizable(false);
+        jDialogAdauga.setSize(new java.awt.Dimension(400, 250));
         jDialogAdauga.addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 jDialogAdaugaWindowClosing(evt);
@@ -449,7 +429,7 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         jPanelForm.add(jLabel1, gridBagConstraints);
 
-        jTextLastName.setToolTipText("");
+        jTextLastName.setToolTipText("Nume");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -467,7 +447,7 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         jPanelForm.add(jLabel2, gridBagConstraints);
 
-        jTextFirstName.setToolTipText("");
+        jTextFirstName.setToolTipText("Prenume");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -485,7 +465,7 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         jPanelForm.add(jLabel3, gridBagConstraints);
 
-        jTextCnp.setToolTipText("");
+        jTextCnp.setToolTipText("CNP");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
@@ -503,7 +483,7 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         jPanelForm.add(jLabel4, gridBagConstraints);
 
-        jTextPhone.setToolTipText("");
+        jTextPhone.setToolTipText("Telefon");
         jTextPhone.setActionCommand("<Not Set>");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -512,6 +492,8 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         gridBagConstraints.ipadx = 140;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         jPanelForm.add(jTextPhone, gridBagConstraints);
+
+        jComboBoxPhoneType.setToolTipText("Tip Telefon");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 3;
@@ -550,9 +532,11 @@ public class FereastraPrincipala extends javax.swing.JFrame {
 
         jDialogSterge.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         jDialogSterge.setTitle("Confirmare");
+        jDialogSterge.setBounds(new java.awt.Rectangle(0, 0, 300, 200));
+        jDialogSterge.setMinimumSize(new java.awt.Dimension(300, 200));
         jDialogSterge.setModal(true);
         jDialogSterge.setResizable(false);
-        jDialogSterge.setSize(new java.awt.Dimension(350, 200));
+        jDialogSterge.setSize(new java.awt.Dimension(300, 200));
         jDialogSterge.getContentPane().setLayout(new java.awt.GridBagLayout());
 
         jButtonNuSterge.setText("Nu");
@@ -593,6 +577,7 @@ public class FereastraPrincipala extends javax.swing.JFrame {
 
         jDialogSortare.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         jDialogSortare.setTitle("Sortare");
+        jDialogSortare.setBounds(new java.awt.Rectangle(0, 0, 300, 200));
         jDialogSortare.setMinimumSize(new java.awt.Dimension(300, 200));
         jDialogSortare.setModal(true);
         jDialogSortare.setResizable(false);
@@ -663,6 +648,8 @@ public class FereastraPrincipala extends javax.swing.JFrame {
 
         jDialogInregistrare.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         jDialogInregistrare.setTitle("Inregistrare");
+        jDialogInregistrare.setBounds(new java.awt.Rectangle(0, 0, 300, 200));
+        jDialogInregistrare.setMinimumSize(new java.awt.Dimension(300, 200));
         jDialogInregistrare.setModal(true);
         jDialogInregistrare.setSize(new java.awt.Dimension(300, 200));
         jDialogInregistrare.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -714,9 +701,11 @@ public class FereastraPrincipala extends javax.swing.JFrame {
 
         jDialogModifica.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         jDialogModifica.setTitle("Modifica");
-        jDialogModifica.setMinimumSize(new java.awt.Dimension(400, 300));
+        jDialogModifica.setBounds(new java.awt.Rectangle(0, 0, 400, 250));
+        jDialogModifica.setMinimumSize(new java.awt.Dimension(400, 250));
         jDialogModifica.setModal(true);
         jDialogModifica.setResizable(false);
+        jDialogModifica.setSize(new java.awt.Dimension(400, 250));
         jDialogModifica.getContentPane().setLayout(new java.awt.GridBagLayout());
 
         jPanelForm1.setLayout(new java.awt.GridBagLayout());
@@ -728,11 +717,12 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         jPanelForm1.add(jLabel9, gridBagConstraints);
 
-        jTextLastName1.setToolTipText("");
+        jTextLastName1.setToolTipText("Nume");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 190;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 0.6;
@@ -745,11 +735,12 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         jPanelForm1.add(jLabel10, gridBagConstraints);
 
-        jTextFirstName1.setToolTipText("");
+        jTextFirstName1.setToolTipText("Prenume");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 190;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 0.6;
@@ -762,11 +753,12 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         jPanelForm1.add(jLabel11, gridBagConstraints);
 
-        jTextCnp1.setToolTipText("");
+        jTextCnp1.setToolTipText("CNP");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 190;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 0.6;
@@ -779,16 +771,20 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         jPanelForm1.add(jLabel12, gridBagConstraints);
 
-        jTextPhone1.setToolTipText("");
+        jTextPhone1.setToolTipText("Telefon");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 140;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         jPanelForm1.add(jTextPhone1, gridBagConstraints);
+
+        jComboBoxPhoneType1.setToolTipText("Tip Telefon");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         jPanelForm1.add(jComboBoxPhoneType1, gridBagConstraints);
 
@@ -887,9 +883,9 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         SearchLayout.setVerticalGroup(
             SearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(SearchLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(12, Short.MAX_VALUE)
                 .addComponent(labelSearch)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(SearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(bClearSearch, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(tfSearch))
@@ -1159,17 +1155,17 @@ public class FereastraPrincipala extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuAboutActionPerformed
 
     private void JMenuOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JMenuOpenActionPerformed
-        //TODO atentie ca se poate deschide fereastra doar apasand pe O - fix it
         try {
             if (jFileChooser1.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                 File fisierSelectat = jFileChooser1.getSelectedFile();
 
-                model = model.loadFromFile(fisierSelectat);  //load(fisierSelectat);
+                model = model.loadFromFile(fisierSelectat);
                 jTable.setModel(model);
                 sorter = new TableRowSorter<>(jTable.getModel());
                 jTable.setRowSorter(sorter);
+                Message.showMessage(labelInfo, "Datele au fost incarcate.");
             }
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException | IllegalStateException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_JMenuOpenActionPerformed
@@ -1186,7 +1182,7 @@ public class FereastraPrincipala extends javax.swing.JFrame {
                 }
 
                 model.saveToFile(fisierSelectat);
-            } catch (IOException e) {
+            } catch (IOException | IllegalStateException e) {
                 JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
@@ -1220,7 +1216,7 @@ public class FereastraPrincipala extends javax.swing.JFrame {
             String nume = abonatDeModificat.getNume();
             String prenume = abonatDeModificat.getPrenume();
             
-            String confirmare = String.format("Sunteti sigur ca doriti sa stergeti abonatul %s %s?", nume, prenume);
+            String confirmare = String.format("Sterg abonatul %s %s?", nume, prenume);
             jLabelSterge.setText(confirmare);
             jDialogSterge.setLocationRelativeTo(null);
             jDialogSterge.setVisible(true);
@@ -1237,8 +1233,6 @@ public class FereastraPrincipala extends javax.swing.JFrame {
             String cnp = jTable.getValueAt(jTable.getSelectedRow(), 2).toString();
             abonatDeModificat = model.getAbonatByCnp(cnp); 
             
-            
-            //abonatDeModificat = model.getElementAt(jTable1.getSelectedRow());
             jTextLastName1.setText(abonatDeModificat.getNume());
             jTextFirstName1.setText(abonatDeModificat.getPrenume());
             jTextCnp1.setText(abonatDeModificat.getCnp());
@@ -1264,9 +1258,9 @@ public class FereastraPrincipala extends javax.swing.JFrame {
     public void salveazaAgenda() {
         try {
             model.saveToFile(fisierAbonati);
-            showMessage(labelInfo, "Datele din agenda au fost salvate.");
-        } catch (IOException ex) {
-            showMessage(labelInfo, ex.getMessage());
+            Message.showMessage(labelInfo, "Datele din agenda au fost salvate.");
+        } catch (IOException | IllegalStateException e) {
+            Message.showMessage(labelInfo, e.getMessage());
         }
     }
     
@@ -1309,7 +1303,7 @@ public class FereastraPrincipala extends javax.swing.JFrame {
             model.adaugaAbonat(abonat);
             
             jDialogAdauga.dispose();
-            showMessage(labelInfo, String.format("Abonatul %s %s a fost adaugat.", abonat.getNume(), abonat.getPrenume()));
+            Message.showMessage(labelInfo, String.format("Abonatul %s %s a fost adaugat.", abonat.getNume(), abonat.getPrenume()));
         } catch (IllegalArgumentException e) {
              JOptionPane.showMessageDialog(this, e.getMessage(), "Eroare", JOptionPane.ERROR_MESSAGE);
         }
@@ -1325,7 +1319,7 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         String nume = abonatDeModificat.getNume();
         String prenume = abonatDeModificat.getPrenume();
         model.stergeAbonat(abonatDeModificat);
-        showMessage(labelInfo, String.format("Abonatul %s %s a fost sters", nume, prenume));
+        Message.showMessage(labelInfo, String.format("Abonatul %s %s a fost sters.", nume, prenume));
         jDialogSterge.dispose();
     }//GEN-LAST:event_jButtonStergeAbonatActionPerformed
     
@@ -1392,7 +1386,7 @@ public class FereastraPrincipala extends javax.swing.JFrame {
             model.modificaAbonat(abonatDeModificat.getCnp(), abonatDateNoi);
             
             jDialogModifica.dispose();
-            showMessage(labelInfo, String.format("Abonatul %s %s a fost modificat.", nume, prenume));
+            Message.showMessage(labelInfo, String.format("Abonatul %s %s a fost modificat.", nume, prenume));
         } catch (IllegalArgumentException e) {
              JOptionPane.showMessageDialog(this, e.getMessage(), "Eroare", JOptionPane.ERROR_MESSAGE);
         }
@@ -1409,7 +1403,7 @@ public class FereastraPrincipala extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuModificaActionPerformed
 
     private void jButtonInregistreazaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonInregistreazaActionPerformed
-        //Check if the code is correct then stop the commercials
+        //Verificam codul si daca este corect, oprim reclamele
         String registerCode = jTextFieldRegisterCode.getText();
         
         if (!registerCode.equals(Register.getRegistrationCode())) {
