@@ -12,17 +12,23 @@ import Reclame.TimerReclame;
 import Utils.Message;
 import Utils.Register;
 import Utils.TimerSave;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import javax.swing.AbstractAction;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
@@ -119,31 +125,40 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         
         //event listener pentru functia de cautare
         tfSearch.getDocument().addDocumentListener(new DocumentListener() {
-        @Override
-        public void changedUpdate(DocumentEvent e) {
-          //warn();
-        }
-        @Override
-        public void removeUpdate(DocumentEvent e) {
-          warn();
-        }
             @Override
-            public void insertUpdate(DocumentEvent e) {
-            warn();
-        }
-
-        public void warn() {
-           String text = tfSearch.getText();
-            if (text.trim().length() == 0) {
-              sorter.setRowFilter(null);
-              labelSearch.setText("Puteti cauta abonati dupa nume, prenume, cnp, telefon sau tip telefon.");
-            } else {
-              sorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
-              labelSearch.setText("Puteti cauta abonati dupa nume, prenume, cnp, telefon sau tip telefon. Filtrul de cautare este activ.");
+            public void changedUpdate(DocumentEvent e) {
+              //warn();
             }
-        }
-    });
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+              warn();
+            }
+                @Override
+                public void insertUpdate(DocumentEvent e) {
+                warn();
+            }
 
+            public void warn() {
+               String text = tfSearch.getText();
+                if (text.trim().length() == 0) {
+                  sorter.setRowFilter(null);
+                  labelSearch.setText("Puteti cauta abonati dupa nume, prenume, cnp, telefon sau tip telefon.");
+                } else {
+                  sorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
+                  labelSearch.setText("Puteti cauta abonati dupa nume, prenume, cnp, telefon sau tip telefon. Filtrul de cautare este activ.");
+                }
+            }
+        });
+        
+       
+        //La apasarea Enter pe tabel -> apare fereastra modifica abonat
+        jTable.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "Enter");
+        jTable.getActionMap().put("Enter", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+            modifica();
+            }
+        });
     }
 
 
@@ -965,6 +980,11 @@ public class FereastraPrincipala extends javax.swing.JFrame {
         MainTable.setLayout(new java.awt.BorderLayout());
 
         jTable.setShowGrid(false);
+        jTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTableMouseClicked(evt);
+            }
+        });
         jScrollPane.setViewportView(jTable);
 
         MainTable.add(jScrollPane, java.awt.BorderLayout.CENTER);
@@ -1447,6 +1467,12 @@ public class FereastraPrincipala extends javax.swing.JFrame {
     private void bClearSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bClearSearchActionPerformed
         tfSearch.setText("");
     }//GEN-LAST:event_bClearSearchActionPerformed
+
+    private void jTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableMouseClicked
+        if(evt.getClickCount() == 2){
+            modifica();
+        }
+    }//GEN-LAST:event_jTableMouseClicked
 
     /**
      * @param args the command line arguments

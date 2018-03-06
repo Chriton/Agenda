@@ -29,7 +29,7 @@ public class TimerSave extends Timer {
      * This will start a periodic save after 10 seconds
      */
     public void porneste() {
-       this.schedule(new TaskSave(tabelAbonati, label, file), delay, intervalMinute*15000); //todo restore to 60000 
+       this.schedule(new TaskSave(tabelAbonati, label, file), delay, intervalMinute*60000);
     }
     
     /**
